@@ -56,7 +56,73 @@ function maskMobileNumber(mobileNumber) {
   return ` ${'*'.repeat(5)}${value.substring(5)}`;
 }
 
+/**
+ * EMI CALCULATION - CORRECT PANEL PATHS
+ * @param {scope} globals
+ */
+(function (globals) {
+
+  function calculateEMI(P, annualRate, n) {
+    const r = annualRate / (12 * 100);
+
+    const emi =
+      (P * r * Math.pow(1 + r, n)) /
+      (Math.pow(1 + r, n) - 1);
+
+    return Math.round(emi);
+  }
+
+  function updateValues(globals) {
+    try {
+      // ✅ FROM offer_Panel
+      const loanAmount = globals.form.offer_Panel.loanAmount?.value || 0;
+      const tenure = globals.form.offer_Panel.loanTenure?.value || 0;
+
+      const interestRate = 10.97;
+      const taxes = 4000;
+
+      if (!loanAmount || !tenure) return;
+
+      // ✅ CALCULATE EMI
+      const emi = calculateEMI(loanAmount, interestRate, tenure);
+
+      // ✅ FORMAT
+      const formattedLoan = `₹${Number(loanAmount).toLocaleString("en-IN")}`;
+      const formattedEMI = `₹${Number(emi).toLocaleString("en-IN")}`;
+
+      // ✅ SET VALUES → loan_offer_summary (SEPARATE PANEL)
+
+      globals.functions.setProperty(
+        globals.form.loan_offer_summary.avail_XPRESS_Personal_Loan_of,
+        { value: formattedLoan }
+      );
+
+      globals.functions.setProperty(
+        globals.form.loan_offer_summary.emi_Amount,
+        { value: formattedEMI }
+      );
+
+      globals.functions.setProperty(
+        globals.form.loan_offer_summary.rate_of_Interest,
+        { value: "10.97%" }
+      );
+
+      globals.functions.setProperty(
+        globals.form.loan_offer_summary.taxes,
+        { value: "₹4,000" }
+      );
+
+    } catch (e) {
+      console.log("Error:", e);
+    }
+  }
+
+  // 🔥 EXECUTE
+  updateValues(globals);
+
+})(globals);
+
 // eslint-disable-next-line import/prefer-default-export
 export {
-  getFullName, days, submitFormArrayToString, maskMobileNumber,
+  getFullName, days, submitFormArrayToString, maskMobileNumber, updateValues
 };

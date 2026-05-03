@@ -1036,6 +1036,7 @@ main .form form select[multiple] {
   top: 4px;                  /* fine-tune alignment */
 }
 
+/*=============================================================================*/
 /* =========================
    CARD ONLY (STRICT SCOPE)
    ========================= */
@@ -1049,8 +1050,8 @@ main .form form select[multiple] {
     "taxes ."
     "disclaimer disclaimer";
 
-  width: 270px !important;
-  max-width: 270px !important;
+   width: 280px !important;
+  max-width: 280px !important;
 
   background: #f6f0e3 !important;
   border-radius: 20px !important;
@@ -1144,6 +1145,7 @@ main .form form select[multiple] {
   font-weight: 600 !important;
   color: #7f8791 !important;
   margin-bottom: 2px !important;
+   white-space: nowrap !important;
 }
 
 /* =========================
