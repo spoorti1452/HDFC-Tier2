@@ -64,26 +64,34 @@ export default function decorate(fieldDiv) {
 
   /* ===== UPDATE ===== */
   function update() {
-    const index = Number(input.value);   // ✅ FIX
-    const actual = steps[index];
+  const index = Number(input.value);
+  const actual = steps[index];
 
-    const percent = (index / (steps.length - 1)) * 100;
+  const percent = (index / (steps.length - 1)) * 100;
 
-    // UI
-    wrapper.style.setProperty("--current-steps", index);
-    wrapper.style.setProperty("--total-steps", steps.length - 1);
-    wrapper.style.setProperty("--progress", percent + "%");
+  // UI
+  wrapper.style.setProperty("--current-steps", index);
+  wrapper.style.setProperty("--total-steps", steps.length - 1);
+  wrapper.style.setProperty("--progress", percent + "%");
 
-    bubble.innerText = format(actual, loan);
-    bubble.style.left = `calc(${percent}% - 15px)`;
+  bubble.innerText = format(actual, loan);
+  bubble.style.left = `calc(${percent}% - 15px)`;
 
-    // ✅ IMPORTANT: update AEM value
-    input.setAttribute("value", actual);
-    input.value = actual;
+  // ❌ REMOVE THIS (breaks slider)
+  // input.value = actual;
 
-    // trigger rule
-    input.dispatchEvent(new Event("change", { bubbles: true }));
-  }
+  // ✅ KEEP SLIDER VALUE AS INDEX
+  input.value = index;
+
+  // ✅ STORE ACTUAL VALUE SEPARATELY
+  input._actualValue = actual;
+
+  // ✅ SEND ACTUAL VALUE TO AEM
+  input.setAttribute("data-value", actual);
+
+  // trigger AEM
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+}
 
   input.addEventListener("input", update);
 
