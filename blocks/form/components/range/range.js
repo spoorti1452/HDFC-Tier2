@@ -15,23 +15,22 @@ export default function decorate(fieldDiv) {
   const input = fieldDiv.querySelector("input");
   if (!input) return fieldDiv;
 
-  const originalName = input.name;
   const loan = isLoan(fieldDiv);
   const steps = loan ? LOAN_STEPS : TENURE_STEPS;
 
-  /* ✅ CREATE HIDDEN INPUT (THIS FIXES AEM) */
-  const hidden = document.createElement("input");
-  hidden.type = "hidden";
-  hidden.name = originalName;
-
-  input.removeAttribute("name");
+  /* ===== KEEP NAME (IMPORTANT) ===== */
+  // ❌ DO NOT remove name
+  // ❌ DO NOT create hidden input
 
   /* ===== SLIDER ===== */
   input.type = "range";
   input.min = 0;
   input.max = steps.length - 1;
   input.step = 1;
-  input.value = steps.length - 1;
+
+  // default index
+  let currentIndex = steps.length - 1;
+  input.value = currentIndex;
 
   /* ===== UI ===== */
   const wrapper = document.createElement("div");
@@ -43,7 +42,6 @@ export default function decorate(fieldDiv) {
   input.after(wrapper);
   wrapper.appendChild(bubble);
   wrapper.appendChild(input);
-  wrapper.appendChild(hidden); // ✅ IMPORTANT
 
   /* ===== TICKS ===== */
   steps.forEach((val, i) => {
@@ -58,7 +56,7 @@ export default function decorate(fieldDiv) {
     tick.style.left = `${(i / (steps.length - 1)) * 100}%`;
 
     label.onclick = () => {
-      input.value = i;
+      currentIndex = i;
       update();
     };
 
@@ -68,24 +66,26 @@ export default function decorate(fieldDiv) {
 
   /* ===== UPDATE ===== */
   function update() {
-    const index = Number(input.value);
-    const actual = steps[index];
-
-    const percent = (index / (steps.length - 1)) * 100;
+    const actual = steps[currentIndex];
+    const percent = (currentIndex / (steps.length - 1)) * 100;
 
     // UI
     wrapper.style.setProperty("--progress", percent + "%");
     bubble.innerText = format(actual, loan);
     bubble.style.left = `calc(${percent}% - 15px)`;
 
-    // ✅ SEND REAL VALUE TO AEM
-    hidden.value = actual;
+    // 🔥 KEY FIX → update real value for AEM
+    input.value = actual;
 
-    // 🔥 TRIGGER RULES
-    hidden.dispatchEvent(new Event("change", { bubbles: true }));
+    // 🔥 trigger AEM rules
+    input.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
-  input.addEventListener("input", update);
+  /* ===== SLIDER MOVE ===== */
+  input.addEventListener("input", () => {
+    currentIndex = Number(input.value);
+    update();
+  });
 
   /* INIT */
   update();
