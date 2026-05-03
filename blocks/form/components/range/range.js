@@ -77,19 +77,14 @@ export default function decorate(fieldDiv) {
   bubble.innerText = format(actual, loan);
   bubble.style.left = `calc(${percent}% - 15px)`;
 
-  // ❌ REMOVE THIS (breaks slider)
-  // input.value = actual;
+  // ✅ keep slider working
+  input.setAttribute("data-index", index);
 
-  // ✅ KEEP SLIDER VALUE AS INDEX
-  input.value = index;
+  // ✅ VERY IMPORTANT: update AEM value
+  input.value = actual;
 
-  // ✅ STORE ACTUAL VALUE SEPARATELY
-  input._actualValue = actual;
-
-  // ✅ SEND ACTUAL VALUE TO AEM
-  input.setAttribute("data-value", actual);
-
-  // trigger AEM
+  // 🔥 trigger AEM
+  input.dispatchEvent(new Event("input", { bubbles: true }));
   input.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
