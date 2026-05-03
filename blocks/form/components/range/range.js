@@ -1,50 +1,121 @@
-function updateBubble(input, element) {
-  const step = input.step || 1;
-  const max = input.max || 0;
-  const min = input.min || 1;
-  const value = input.value || 1;
-  const current = Math.ceil((value - min) / step);
-  const total = Math.ceil((max - min) / step);
-  const bubble = element.querySelector('.range-bubble');
-  // during initial render the width is 0. Hence using a default here.
-  const bubbleWidth = bubble.getBoundingClientRect().width || 31;
-  const left = `${(current / total) * 100}% - ${(current / total) * bubbleWidth}px`;
-  bubble.innerText = `${value}`;
-  const steps = {
-    '--total-steps': Math.ceil((max - min) / step),
-    '--current-steps': Math.ceil((value - min) / step),
-  };
-  const style = Object.entries(steps).map(([varName, varValue]) => `${varName}:${varValue}`).join(';');
-  bubble.style.left = `calc(${left})`;
-  element.setAttribute('style', style);
+const LOAN_STEPS = [50000, 200000, 400000, 600000, 800000, 1000000, 1500000];
+const TENURE_STEPS = [12, 24, 36, 48, 60, 72, 84];
+
+function isLoan(fieldDiv) {
+  return fieldDiv.classList.contains("field-loanamount");
 }
-export default async function decorate(fieldDiv, fieldJson) {
-  const input = fieldDiv.querySelector('input');
-  // modify the type in case it is not range.
-  input.type = 'range';
-  input.min = input.min || 1;
-  input.max = input.max || 100;
-  input.step = fieldJson?.properties?.stepValue || 1;
-  // create a wrapper div to provide the min/max and current value
-  const div = document.createElement('div');
-  div.className = 'range-widget-wrapper decorated';
-  input.after(div);
-  const hover = document.createElement('span');
-  hover.className = 'range-bubble';
-  const rangeMinEl = document.createElement('span');
-  rangeMinEl.className = 'range-min';
-  const rangeMaxEl = document.createElement('span');
-  rangeMaxEl.className = 'range-max';
-  rangeMinEl.innerText = `${input.min || 1}`;
-  rangeMaxEl.innerText = `${input.max}`;
-  div.appendChild(hover);
-  // move the input element within the wrapper div
-  div.appendChild(input);
-  div.appendChild(rangeMinEl);
-  div.appendChild(rangeMaxEl);
-  input.addEventListener('input', (e) => {
-    updateBubble(e.target, div);
+
+function format(val, loan) {
+  return loan
+    ? "₹" + Number(val).toLocaleString("en-IN")
+    : val + " months";
+}
+
+export default function decorate(fieldDiv) {
+  const input = fieldDiv.querySelector("input");
+  if (!input) return fieldDiv;
+
+  const originalName = input.name;
+  const loan = isLoan(fieldDiv);
+  const steps = loan ? LOAN_STEPS : TENURE_STEPS;
+
+  /* ===== OVERRIDE VALUE (KEY FIX) ===== */
+  const descriptor = Object.getOwnPropertyDescriptor(
+    HTMLInputElement.prototype,
+    "value"
+  );
+
+  Object.defineProperty(input, "value", {
+    get() {
+      return this._actualValue ?? descriptor.get.call(this);
+    },
+    set(val) {
+      const num = Number(val);
+
+      // if actual value passed → convert to index
+      const index = steps.findIndex(v => v === num);
+
+      if (index !== -1) {
+        descriptor.set.call(this, index);
+      } else {
+        descriptor.set.call(this, val);
+      }
+    }
   });
-  updateBubble(input, div);
+
+  /* ===== HIDDEN INPUT ===== */
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = originalName;
+
+  input.removeAttribute("name");
+
+  /* ===== SLIDER ===== */
+  input.type = "range";
+  input.min = 0;
+  input.max = steps.length - 1;
+  input.step = 1; // ✅ IMPORTANT
+  input.value = steps.length - 1;
+
+  /* ===== UI ===== */
+  const wrapper = document.createElement("div");
+  wrapper.className = "range-widget-wrapper decorated";
+
+  const bubble = document.createElement("span");
+  bubble.className = "range-bubble";
+
+  input.after(wrapper);
+  wrapper.appendChild(bubble);
+  wrapper.appendChild(input);
+  wrapper.appendChild(hidden);
+
+  /* ===== TICKS ===== */
+  steps.forEach((val, i) => {
+    const tick = document.createElement("span");
+    tick.className = "custom-range-tick";
+
+    const label = document.createElement("span");
+    label.innerText = loan
+      ? (val === 50000 ? "50K" : val / 100000 + "L")
+      : val + "m";
+
+    tick.style.left = `${(i / (steps.length - 1)) * 100}%`;
+    tick.appendChild(label);
+
+    label.onclick = () => {
+      input.value = i;
+      update();
+    };
+
+    wrapper.appendChild(tick);
+  });
+
+  /* ===== UPDATE ===== */
+ function update() {
+  const index = Number(descriptor.get.call(input));
+  const actual = steps[index];
+
+  const percent = (index / (steps.length - 1)) * 100;
+
+  // ✅ FIX: sync CSS variables
+  wrapper.style.setProperty("--current-steps", index);
+  wrapper.style.setProperty("--total-steps", steps.length - 1);
+  wrapper.style.setProperty("--progress", percent + "%");
+
+  // UI
+  bubble.innerText = format(actual, loan);
+  bubble.style.left = `calc(${percent}% - 15px)`;
+
+  // AEM sync
+  input._actualValue = actual;
+  hidden.value = actual;
+
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+}
+  input.addEventListener("input", update);
+
+  /* ===== INIT ===== */
+  update();
+
   return fieldDiv;
 }
