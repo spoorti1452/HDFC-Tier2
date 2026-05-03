@@ -15,17 +15,22 @@ export default function decorate(fieldDiv) {
   const input = fieldDiv.querySelector("input");
   if (!input) return fieldDiv;
 
-  const originalName = input.name;
   const loan = isLoan(fieldDiv);
   const steps = loan ? LOAN_STEPS : TENURE_STEPS;
 
-  /* ===== SLIDER SETUP ===== */
+  /* ===== REMOVE THESE (FIX) ===== */
+  // ❌ NO descriptor
+  // ❌ NO Object.defineProperty
+  // ❌ NO removeAttribute("name")
+
+  /* ===== SLIDER ===== */
   input.type = "range";
   input.min = 0;
   input.max = steps.length - 1;
   input.step = 1;
+  input.value = steps.length - 1;
 
-  /* ===== WRAPPER ===== */
+  /* ===== UI ===== */
   const wrapper = document.createElement("div");
   wrapper.className = "range-widget-wrapper decorated";
 
@@ -57,31 +62,32 @@ export default function decorate(fieldDiv) {
     wrapper.appendChild(tick);
   });
 
-  /* ===== UPDATE FUNCTION (CRITICAL) ===== */
+  /* ===== UPDATE ===== */
   function update() {
-    const index = Number(input.value);
+    const index = Number(input.value);   // ✅ FIX
     const actual = steps[index];
 
     const percent = (index / (steps.length - 1)) * 100;
 
-    // UI update
+    // UI
+    wrapper.style.setProperty("--current-steps", index);
+    wrapper.style.setProperty("--total-steps", steps.length - 1);
     wrapper.style.setProperty("--progress", percent + "%");
+
     bubble.innerText = format(actual, loan);
     bubble.style.left = `calc(${percent}% - 15px)`;
 
-    // 🔥 IMPORTANT: update actual AEM value
+    // ✅ IMPORTANT: update AEM value
+    input.setAttribute("value", actual);
     input.value = actual;
 
-    // 🔥 trigger AEM rule engine
-    input.dispatchEvent(new Event("input", { bubbles: true }));
+    // trigger rule
     input.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
-  /* ===== EVENTS ===== */
   input.addEventListener("input", update);
 
   /* ===== INIT ===== */
-  input.value = steps.length - 1;
   update();
 
   return fieldDiv;
