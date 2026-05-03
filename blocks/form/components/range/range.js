@@ -19,45 +19,13 @@ export default function decorate(fieldDiv) {
   const loan = isLoan(fieldDiv);
   const steps = loan ? LOAN_STEPS : TENURE_STEPS;
 
-  /* ===== OVERRIDE VALUE (KEY FIX) ===== */
-  const descriptor = Object.getOwnPropertyDescriptor(
-    HTMLInputElement.prototype,
-    "value"
-  );
-
-  Object.defineProperty(input, "value", {
-    get() {
-      return this._actualValue ?? descriptor.get.call(this);
-    },
-    set(val) {
-      const num = Number(val);
-
-      // if actual value passed → convert to index
-      const index = steps.findIndex(v => v === num);
-
-      if (index !== -1) {
-        descriptor.set.call(this, index);
-      } else {
-        descriptor.set.call(this, val);
-      }
-    }
-  });
-
-  /* ===== HIDDEN INPUT ===== */
-  const hidden = document.createElement("input");
-  hidden.type = "hidden";
-  hidden.name = originalName;
-
-  input.removeAttribute("name");
-
-  /* ===== SLIDER ===== */
+  /* ===== SLIDER SETUP ===== */
   input.type = "range";
   input.min = 0;
   input.max = steps.length - 1;
-  input.step = 1; // ✅ IMPORTANT
-  input.value = steps.length - 1;
+  input.step = 1;
 
-  /* ===== UI ===== */
+  /* ===== WRAPPER ===== */
   const wrapper = document.createElement("div");
   wrapper.className = "range-widget-wrapper decorated";
 
@@ -67,7 +35,6 @@ export default function decorate(fieldDiv) {
   input.after(wrapper);
   wrapper.appendChild(bubble);
   wrapper.appendChild(input);
-  wrapper.appendChild(hidden);
 
   /* ===== TICKS ===== */
   steps.forEach((val, i) => {
@@ -80,41 +47,41 @@ export default function decorate(fieldDiv) {
       : val + "m";
 
     tick.style.left = `${(i / (steps.length - 1)) * 100}%`;
-    tick.appendChild(label);
 
     label.onclick = () => {
       input.value = i;
       update();
     };
 
+    tick.appendChild(label);
     wrapper.appendChild(tick);
   });
 
-  /* ===== UPDATE ===== */
- function update() {
-  const index = Number(descriptor.get.call(input));
-  const actual = steps[index];
+  /* ===== UPDATE FUNCTION (CRITICAL) ===== */
+  function update() {
+    const index = Number(input.value);
+    const actual = steps[index];
 
-  const percent = (index / (steps.length - 1)) * 100;
+    const percent = (index / (steps.length - 1)) * 100;
 
-  // ✅ FIX: sync CSS variables
-  wrapper.style.setProperty("--current-steps", index);
-  wrapper.style.setProperty("--total-steps", steps.length - 1);
-  wrapper.style.setProperty("--progress", percent + "%");
+    // UI update
+    wrapper.style.setProperty("--progress", percent + "%");
+    bubble.innerText = format(actual, loan);
+    bubble.style.left = `calc(${percent}% - 15px)`;
 
-  // UI
-  bubble.innerText = format(actual, loan);
-  bubble.style.left = `calc(${percent}% - 15px)`;
+    // 🔥 IMPORTANT: update actual AEM value
+    input.value = actual;
 
-  // AEM sync
-  input._actualValue = actual;
-  hidden.value = actual;
+    // 🔥 trigger AEM rule engine
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
 
-  input.dispatchEvent(new Event("change", { bubbles: true }));
-}
+  /* ===== EVENTS ===== */
   input.addEventListener("input", update);
 
   /* ===== INIT ===== */
+  input.value = steps.length - 1;
   update();
 
   return fieldDiv;
