@@ -43,35 +43,37 @@ function getActualValue(input, percent) {
    ADD TICKS
 ========================= */
 function addTicks(wrapper, input) {
-  const ticks = document.createElement("div");
-  ticks.className = "range-ticks";
-
   const values =
     input.name === "loanAmount" ? AMOUNT_VALUES : TENURE_VALUES;
 
   values.forEach((val, i) => {
-    const span = document.createElement("span");
+    const tick = document.createElement("span");
+    tick.className = "custom-range-tick";
 
+    const label = document.createElement("span");
+
+    // label text
     if (input.name === "loanAmount") {
-      span.textContent = val >= 100000
-        ? val / 100000 + "L"
-        : val / 1000 + "K";
+      label.textContent =
+        val >= 100000 ? val / 100000 + "L" : val / 1000 + "K";
     } else {
-      span.textContent = val + "m";
+      label.textContent = val + "m";
     }
 
-    span.onclick = () => {
+    // ✅ POSITION (IMPORTANT)
+    tick.style.left = `${(i / (values.length - 1)) * 100}%`;
+
+    // click support
+    label.onclick = () => {
       const percent = (i / (values.length - 1)) * 100;
       input.value = percent;
       input.dispatchEvent(new Event("input", { bubbles: true }));
     };
 
-    ticks.appendChild(span);
+    tick.appendChild(label);
+    wrapper.appendChild(tick);
   });
-
-  wrapper.appendChild(ticks);
 }
-
 /* =========================
    UPDATE UI + VALUE
 ========================= */
