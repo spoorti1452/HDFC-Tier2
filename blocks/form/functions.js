@@ -64,12 +64,10 @@ function updateValues(globals) {
 
   function calculateEMI(P, annualRate, n) {
     const r = annualRate / (12 * 100);
-
-    const emi =
+    return Math.round(
       (P * r * Math.pow(1 + r, n)) /
-      (Math.pow(1 + r, n) - 1);
-
-    return Math.round(emi);
+      (Math.pow(1 + r, n) - 1)
+    );
   }
 
   try {
@@ -83,24 +81,24 @@ function updateValues(globals) {
     const formattedLoan = `₹${Number(loanAmount).toLocaleString("en-IN")}`;
     const formattedEMI = `₹${Number(emi).toLocaleString("en-IN")}`;
 
-    // ✅ SET VALUES (CORRECT PANELS)
+    // ✅ CORRECT PATHS
     globals.functions.setProperty(
-      globals.form.loan_offer_summary.avail_XPRESS_Personal_Loan_of,
+      globals.form.avail_XPRESS_Personal_Loan_of,
       { value: formattedLoan }
     );
 
     globals.functions.setProperty(
-      globals.form.loan_offer_summary.emi_Amount,
+      globals.form.emi_Amount,
       { value: formattedEMI }
     );
 
     globals.functions.setProperty(
-      globals.form.loan_offer_summary.rate_of_Interest,
+      globals.form.rate_of_Interest,
       { value: "10.97%" }
     );
 
     globals.functions.setProperty(
-      globals.form.loan_offer_summary.taxes,
+      globals.form.taxes,
       { value: "₹4,000" }
     );
 
@@ -108,7 +106,6 @@ function updateValues(globals) {
     console.log("EMI Error:", e);
   }
 }
-
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,
