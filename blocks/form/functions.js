@@ -71,16 +71,8 @@ function updateValues(globals) {
   }
 
   try {
-    // ✅ FIX: read actual value from slider
-    const loanAmount =
-      globals.form.offer_Panel.loanAmount?._actualValue ||
-      globals.form.offer_Panel.loanAmount?.value ||
-      0;
-
-    const tenure =
-      globals.form.offer_Panel.loanTenure?._actualValue ||
-      globals.form.offer_Panel.loanTenure?.value ||
-      0;
+    const loanAmount = globals.form.offer_Panel.loanAmount?.value || 0;
+    const tenure = globals.form.offer_Panel.loanTenure?.value || 0;
 
     if (!loanAmount || !tenure) return;
 
@@ -90,22 +82,22 @@ function updateValues(globals) {
     const formattedEMI = `₹${Number(emi).toLocaleString("en-IN")}`;
 
     globals.functions.setProperty(
-      globals.form.avail_XPRESS_Personal_Loan_of,
+      globals.form.loan_offer_summary.avail_XPRESS_Personal_Loan_of,
       { value: formattedLoan }
     );
 
     globals.functions.setProperty(
-      globals.form.emi_Amount,
+      globals.form.loan_offer_summary.emi_Amount,
       { value: formattedEMI }
     );
 
     globals.functions.setProperty(
-      globals.form.rate_of_Interest,
+      globals.form.loan_offer_summary.rate_of_Interest,
       { value: "10.97%" }
     );
 
     globals.functions.setProperty(
-      globals.form.taxes,
+      globals.form.loan_offer_summary.taxes,
       { value: "₹4,000" }
     );
 

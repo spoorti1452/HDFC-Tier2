@@ -15,8 +15,16 @@ export default function decorate(fieldDiv) {
   const input = fieldDiv.querySelector("input");
   if (!input) return fieldDiv;
 
+  const originalName = input.name;
   const loan = isLoan(fieldDiv);
   const steps = loan ? LOAN_STEPS : TENURE_STEPS;
+
+  /* ✅ CREATE HIDDEN INPUT (THIS FIXES AEM) */
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = originalName;
+
+  input.removeAttribute("name");
 
   /* ===== SLIDER ===== */
   input.type = "range";
@@ -35,6 +43,7 @@ export default function decorate(fieldDiv) {
   input.after(wrapper);
   wrapper.appendChild(bubble);
   wrapper.appendChild(input);
+  wrapper.appendChild(hidden); // ✅ IMPORTANT
 
   /* ===== TICKS ===== */
   steps.forEach((val, i) => {
@@ -65,23 +74,20 @@ export default function decorate(fieldDiv) {
     const percent = (index / (steps.length - 1)) * 100;
 
     // UI
-    wrapper.style.setProperty("--current-steps", index);
-    wrapper.style.setProperty("--total-steps", steps.length - 1);
     wrapper.style.setProperty("--progress", percent + "%");
-
     bubble.innerText = format(actual, loan);
     bubble.style.left = `calc(${percent}% - 15px)`;
 
-    // ✅ STORE ACTUAL VALUE (THIS IS KEY)
-    input._actualValue = actual;
+    // ✅ SEND REAL VALUE TO AEM
+    hidden.value = actual;
 
-    // 🔥 trigger AEM rule engine
-    input.dispatchEvent(new Event("change", { bubbles: true }));
+    // 🔥 TRIGGER RULES
+    hidden.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
   input.addEventListener("input", update);
 
-  /* ===== INIT ===== */
+  /* INIT */
   update();
 
   return fieldDiv;
