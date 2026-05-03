@@ -18,19 +18,14 @@ export default function decorate(fieldDiv) {
   const loan = isLoan(fieldDiv);
   const steps = loan ? LOAN_STEPS : TENURE_STEPS;
 
-  /* ===== KEEP NAME (IMPORTANT) ===== */
-  // ❌ DO NOT remove name
-  // ❌ DO NOT create hidden input
-
-  /* ===== SLIDER ===== */
+  /* ===== KEEP ORIGINAL INPUT ===== */
   input.type = "range";
   input.min = 0;
   input.max = steps.length - 1;
   input.step = 1;
 
-  // default index
-  let currentIndex = steps.length - 1;
-  input.value = currentIndex;
+  let index = steps.length - 1;
+  input.value = index;
 
   /* ===== UI ===== */
   const wrapper = document.createElement("div");
@@ -56,7 +51,7 @@ export default function decorate(fieldDiv) {
     tick.style.left = `${(i / (steps.length - 1)) * 100}%`;
 
     label.onclick = () => {
-      currentIndex = i;
+      index = i;
       update();
     };
 
@@ -66,24 +61,27 @@ export default function decorate(fieldDiv) {
 
   /* ===== UPDATE ===== */
   function update() {
-    const actual = steps[currentIndex];
-    const percent = (currentIndex / (steps.length - 1)) * 100;
+    const actual = steps[index];
+    const percent = (index / (steps.length - 1)) * 100;
 
     // UI
     wrapper.style.setProperty("--progress", percent + "%");
     bubble.innerText = format(actual, loan);
     bubble.style.left = `calc(${percent}% - 15px)`;
 
-    // 🔥 KEY FIX → update real value for AEM
-    input.value = actual;
+    // ✅ KEEP SLIDER WORKING
+    input.value = index;
 
-    // 🔥 trigger AEM rules
+    // ✅ STORE REAL VALUE FOR AEM
+    input.setAttribute("data-value", actual);
+
+    // 🔥 TRIGGER RULE ENGINE
     input.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
-  /* ===== SLIDER MOVE ===== */
+  /* ===== SLIDE ===== */
   input.addEventListener("input", () => {
-    currentIndex = Number(input.value);
+    index = Number(input.value);
     update();
   });
 
