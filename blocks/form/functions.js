@@ -71,8 +71,16 @@ function updateValues(globals) {
   }
 
   try {
-    const loanAmount = globals.form.offer_Panel.loanAmount?.value || 0;
-    const tenure = globals.form.offer_Panel.loanTenure?.value || 0;
+    // ✅ FIX: read actual value from slider
+    const loanAmount =
+      globals.form.offer_Panel.loanAmount?._actualValue ||
+      globals.form.offer_Panel.loanAmount?.value ||
+      0;
+
+    const tenure =
+      globals.form.offer_Panel.loanTenure?._actualValue ||
+      globals.form.offer_Panel.loanTenure?.value ||
+      0;
 
     if (!loanAmount || !tenure) return;
 
@@ -81,7 +89,6 @@ function updateValues(globals) {
     const formattedLoan = `₹${Number(loanAmount).toLocaleString("en-IN")}`;
     const formattedEMI = `₹${Number(emi).toLocaleString("en-IN")}`;
 
-    // ✅ CORRECT PATHS
     globals.functions.setProperty(
       globals.form.avail_XPRESS_Personal_Loan_of,
       { value: formattedLoan }

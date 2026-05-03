@@ -18,11 +18,6 @@ export default function decorate(fieldDiv) {
   const loan = isLoan(fieldDiv);
   const steps = loan ? LOAN_STEPS : TENURE_STEPS;
 
-  /* ===== REMOVE THESE (FIX) ===== */
-  // ❌ NO descriptor
-  // ❌ NO Object.defineProperty
-  // ❌ NO removeAttribute("name")
-
   /* ===== SLIDER ===== */
   input.type = "range";
   input.min = 0;
@@ -64,29 +59,25 @@ export default function decorate(fieldDiv) {
 
   /* ===== UPDATE ===== */
   function update() {
-  const index = Number(input.value);
-  const actual = steps[index];
+    const index = Number(input.value);
+    const actual = steps[index];
 
-  const percent = (index / (steps.length - 1)) * 100;
+    const percent = (index / (steps.length - 1)) * 100;
 
-  // UI
-  wrapper.style.setProperty("--current-steps", index);
-  wrapper.style.setProperty("--total-steps", steps.length - 1);
-  wrapper.style.setProperty("--progress", percent + "%");
+    // UI
+    wrapper.style.setProperty("--current-steps", index);
+    wrapper.style.setProperty("--total-steps", steps.length - 1);
+    wrapper.style.setProperty("--progress", percent + "%");
 
-  bubble.innerText = format(actual, loan);
-  bubble.style.left = `calc(${percent}% - 15px)`;
+    bubble.innerText = format(actual, loan);
+    bubble.style.left = `calc(${percent}% - 15px)`;
 
-  // ✅ keep slider working
-  input.setAttribute("data-index", index);
+    // ✅ STORE ACTUAL VALUE (THIS IS KEY)
+    input._actualValue = actual;
 
-  // ✅ VERY IMPORTANT: update AEM value
-  input.value = actual;
-
-  // 🔥 trigger AEM
-  input.dispatchEvent(new Event("input", { bubbles: true }));
-  input.dispatchEvent(new Event("change", { bubbles: true }));
-}
+    // 🔥 trigger AEM rule engine
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
 
   input.addEventListener("input", update);
 
