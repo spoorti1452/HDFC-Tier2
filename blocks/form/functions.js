@@ -61,23 +61,28 @@ function maskMobileNumber(mobileNumber) {
  * @param {scope} globals
  */
 function updateValues(globals) {
-
-  function calculateEMI(P, rate, n) {
-    const r = rate / (12 * 100);
-    return Math.round(
-      (P * r * Math.pow(1 + r, n)) /
-      (Math.pow(1 + r, n) - 1)
-    );
-  }
-
   try {
-    const loanAmount = Number(globals.form.offer_Panel.loanAmount?.value || 0);
-    const tenure = Number(globals.form.offer_Panel.loanTenure?.value || 0);
+    // ✅ GET VALUES FROM SLIDER (IMPORTANT)
+    const loanAmount = Number(
+      document.querySelector('[name="loanAmount"]')?.dataset?.actualValue
+    ) || 0;
+
+    const tenure = Number(
+      document.querySelector('[name="loanTenure"]')?.dataset?.actualValue
+    ) || 0;
 
     if (!loanAmount || !tenure) return;
 
-    const emi = calculateEMI(loanAmount, 10.97, tenure);
+    const annualRate = 10.97;
+    const r = annualRate / (12 * 100);
 
+    const emi =
+      (loanAmount * r * Math.pow(1 + r, tenure)) /
+      (Math.pow(1 + r, tenure) - 1);
+
+    const emiRounded = Math.round(emi);
+
+    // ✅ UPDATE CORRECT FIELDS (YOUR PATH)
     globals.functions.setProperty(
       globals.form.loan_offer_summary.avail_XPRESS_Personal_Loan_of,
       { value: `₹${loanAmount.toLocaleString("en-IN")}` }
@@ -85,7 +90,7 @@ function updateValues(globals) {
 
     globals.functions.setProperty(
       globals.form.loan_offer_summary.emi_Amount,
-      { value: `₹${emi.toLocaleString("en-IN")}` }
+      { value: `₹${emiRounded.toLocaleString("en-IN")}` }
     );
 
     globals.functions.setProperty(
@@ -102,6 +107,7 @@ function updateValues(globals) {
     console.log("EMI ERROR:", e);
   }
 }
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,

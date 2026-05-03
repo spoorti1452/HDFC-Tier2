@@ -1,29 +1,114 @@
-const LOAN_STEPS = [50000, 200000, 400000, 600000, 800000, 1000000, 1500000];
-const TENURE_STEPS = [12, 24, 36, 48, 60, 72, 84];
+const AMOUNT_VALUES = [50000, 200000, 400000, 600000, 800000, 1000000, 1500000];
+const TENURE_VALUES = [12, 24, 36, 48, 60, 72, 84];
 
-function isLoan(fieldDiv) {
-  return fieldDiv.classList.contains("field-loanamount");
+/* =========================
+   FORMAT VALUE
+========================= */
+function formatValue(input, percent) {
+  const name = input.name;
+
+  if (name === "loanAmount") {
+    const index = Math.round((percent / 100) * (AMOUNT_VALUES.length - 1));
+    return `₹${AMOUNT_VALUES[index].toLocaleString("en-IN")}`;
+  }
+
+  if (name === "loanTenure") {
+    const index = Math.round((percent / 100) * (TENURE_VALUES.length - 1));
+    return `${TENURE_VALUES[index]} months`;
+  }
+
+  return percent;
 }
 
-function format(val, loan) {
-  return loan
-    ? "₹" + Number(val).toLocaleString("en-IN")
-    : val + " months";
+/* =========================
+   GET ACTUAL VALUE
+========================= */
+function getActualValue(input, percent) {
+  const name = input.name;
+
+  if (name === "loanAmount") {
+    const index = Math.round((percent / 100) * (AMOUNT_VALUES.length - 1));
+    return AMOUNT_VALUES[index];
+  }
+
+  if (name === "loanTenure") {
+    const index = Math.round((percent / 100) * (TENURE_VALUES.length - 1));
+    return TENURE_VALUES[index];
+  }
+
+  return percent;
 }
 
+/* =========================
+   ADD TICKS
+========================= */
+function addTicks(wrapper, input) {
+  const ticks = document.createElement("div");
+  ticks.className = "range-ticks";
+
+  const values =
+    input.name === "loanAmount" ? AMOUNT_VALUES : TENURE_VALUES;
+
+  values.forEach((val, i) => {
+    const span = document.createElement("span");
+
+    if (input.name === "loanAmount") {
+      span.textContent = val >= 100000
+        ? val / 100000 + "L"
+        : val / 1000 + "K";
+    } else {
+      span.textContent = val + "m";
+    }
+
+    span.onclick = () => {
+      const percent = (i / (values.length - 1)) * 100;
+      input.value = percent;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+
+    ticks.appendChild(span);
+  });
+
+  wrapper.appendChild(ticks);
+}
+
+/* =========================
+   UPDATE UI + VALUE
+========================= */
+function updateBubble(input, wrapper) {
+  const percent = Number(input.value);
+  const bubble = wrapper.querySelector(".range-bubble");
+
+  const actual = getActualValue(input, percent);
+
+  // ✅ store real value (IMPORTANT)
+  input.dataset.actualValue = actual;
+
+  // UI
+  bubble.innerText = formatValue(input, percent);
+
+  const totalSteps = 100;
+  const currentSteps = percent;
+
+  wrapper.style.setProperty("--total-steps", totalSteps);
+  wrapper.style.setProperty("--current-steps", currentSteps);
+
+  bubble.style.left = `calc(${percent}% - 15px)`;
+}
+
+/* =========================
+   DECORATE
+========================= */
 export default function decorate(fieldDiv) {
   const input = fieldDiv.querySelector("input");
   if (!input) return fieldDiv;
 
-  const loan = isLoan(fieldDiv);
-  const steps = loan ? LOAN_STEPS : TENURE_STEPS;
-
+  // ✅ USE PERCENT BASED SLIDER
   input.type = "range";
   input.min = 0;
-  input.max = steps.length - 1;
+  input.max = 100;
   input.step = 1;
-
-  let index = steps.length - 1;
+  input.value = 50;
 
   const wrapper = document.createElement("div");
   wrapper.className = "range-widget-wrapper decorated";
@@ -35,38 +120,14 @@ export default function decorate(fieldDiv) {
   wrapper.appendChild(bubble);
   wrapper.appendChild(input);
 
-  function updateUI() {
-    const actual = steps[index];
-    const percent = (index / (steps.length - 1)) * 100;
+  addTicks(wrapper, input);
 
-    wrapper.style.setProperty("--progress", percent + "%");
-    bubble.innerText = format(actual, loan);
-    bubble.style.left = `calc(${percent}% - 15px)`;
-  }
-
-  function syncToAEM() {
-    const actual = steps[index];
-
-    // 🔥 THIS IS THE KEY LINE
-    input.setAttribute("value", actual);
-    input.value = actual;
-
-    input.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-
-  input.addEventListener("input", (e) => {
-    index = Number(e.target.value);
-
-    updateUI();
-
-    // ⏱ delay prevents slider jump
-    setTimeout(syncToAEM, 0);
+  input.addEventListener("input", () => {
+    updateBubble(input, wrapper);
   });
 
   // INIT
-  input.value = index;
-  updateUI();
-  syncToAEM();
+  updateBubble(input, wrapper);
 
   return fieldDiv;
 }
