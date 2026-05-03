@@ -18,7 +18,6 @@ export default function decorate(fieldDiv) {
   const loan = isLoan(fieldDiv);
   const steps = loan ? LOAN_STEPS : TENURE_STEPS;
 
-  /* ===== KEEP ORIGINAL INPUT ===== */
   input.type = "range";
   input.min = 0;
   input.max = steps.length - 1;
@@ -27,7 +26,6 @@ export default function decorate(fieldDiv) {
   let index = steps.length - 1;
   input.value = index;
 
-  /* ===== UI ===== */
   const wrapper = document.createElement("div");
   wrapper.className = "range-widget-wrapper decorated";
 
@@ -38,7 +36,6 @@ export default function decorate(fieldDiv) {
   wrapper.appendChild(bubble);
   wrapper.appendChild(input);
 
-  /* ===== TICKS ===== */
   steps.forEach((val, i) => {
     const tick = document.createElement("span");
     tick.className = "custom-range-tick";
@@ -59,33 +56,30 @@ export default function decorate(fieldDiv) {
     wrapper.appendChild(tick);
   });
 
-  /* ===== UPDATE ===== */
   function update() {
     const actual = steps[index];
     const percent = (index / (steps.length - 1)) * 100;
 
-    // UI
     wrapper.style.setProperty("--progress", percent + "%");
+
     bubble.innerText = format(actual, loan);
     bubble.style.left = `calc(${percent}% - 15px)`;
 
-    // ✅ KEEP SLIDER WORKING
+    // ✅ slider stays smooth
     input.value = index;
 
-    // ✅ STORE REAL VALUE FOR AEM
-    input.setAttribute("data-value", actual);
+    // 🔥 STORE REAL VALUE HERE (IMPORTANT)
+    input.dataset.value = actual;
 
-    // 🔥 TRIGGER RULE ENGINE
+    // 🔥 trigger AEM
     input.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
-  /* ===== SLIDE ===== */
   input.addEventListener("input", () => {
     index = Number(input.value);
     update();
   });
 
-  /* INIT */
   update();
 
   return fieldDiv;

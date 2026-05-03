@@ -71,17 +71,12 @@ function updateValues(globals) {
   }
 
   try {
-    /* 🔥 READ FROM data-value */
     const loanField = globals.form.offer_Panel.loanAmount;
     const tenureField = globals.form.offer_Panel.loanTenure;
 
-    const loanAmount = Number(
-      loanField?.$element?.getAttribute("data-value")
-    ) || 0;
-
-    const tenure = Number(
-      tenureField?.$element?.getAttribute("data-value")
-    ) || 0;
+    // ✅ READ FROM dataset (EDS SAFE)
+    const loanAmount = Number(loanField?.dataset?.value || 0);
+    const tenure = Number(tenureField?.dataset?.value || 0);
 
     if (!loanAmount || !tenure) return;
 
