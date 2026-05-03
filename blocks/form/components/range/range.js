@@ -24,7 +24,6 @@ export default function decorate(fieldDiv) {
   input.step = 1;
 
   let index = steps.length - 1;
-  input.value = index;
 
   const wrapper = document.createElement("div");
   wrapper.className = "range-widget-wrapper decorated";
@@ -36,51 +35,38 @@ export default function decorate(fieldDiv) {
   wrapper.appendChild(bubble);
   wrapper.appendChild(input);
 
-  steps.forEach((val, i) => {
-    const tick = document.createElement("span");
-    tick.className = "custom-range-tick";
-
-    const label = document.createElement("span");
-    label.innerText = loan
-      ? (val === 50000 ? "50K" : val / 100000 + "L")
-      : val + "m";
-
-    tick.style.left = `${(i / (steps.length - 1)) * 100}%`;
-
-    label.onclick = () => {
-      index = i;
-      update();
-    };
-
-    tick.appendChild(label);
-    wrapper.appendChild(tick);
-  });
-
-  function update() {
+  function updateUI() {
     const actual = steps[index];
     const percent = (index / (steps.length - 1)) * 100;
 
     wrapper.style.setProperty("--progress", percent + "%");
-
     bubble.innerText = format(actual, loan);
     bubble.style.left = `calc(${percent}% - 15px)`;
+  }
 
-    // ✅ slider stays smooth
-    input.value = index;
+  function syncToAEM() {
+    const actual = steps[index];
 
-    // 🔥 STORE REAL VALUE HERE (IMPORTANT)
-    input.dataset.value = actual;
+    // 🔥 THIS IS THE KEY LINE
+    input.setAttribute("value", actual);
+    input.value = actual;
 
-    // 🔥 trigger AEM
     input.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
-  input.addEventListener("input", () => {
-    index = Number(input.value);
-    update();
+  input.addEventListener("input", (e) => {
+    index = Number(e.target.value);
+
+    updateUI();
+
+    // ⏱ delay prevents slider jump
+    setTimeout(syncToAEM, 0);
   });
 
-  update();
+  // INIT
+  input.value = index;
+  updateUI();
+  syncToAEM();
 
   return fieldDiv;
 }

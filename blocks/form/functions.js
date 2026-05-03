@@ -71,28 +71,21 @@ function updateValues(globals) {
   }
 
   try {
-    const loanField = globals.form.offer_Panel.loanAmount;
-    const tenureField = globals.form.offer_Panel.loanTenure;
-
-    // ✅ READ FROM dataset (EDS SAFE)
-    const loanAmount = Number(loanField?.dataset?.value || 0);
-    const tenure = Number(tenureField?.dataset?.value || 0);
+    const loanAmount = Number(globals.form.offer_Panel.loanAmount?.value || 0);
+    const tenure = Number(globals.form.offer_Panel.loanTenure?.value || 0);
 
     if (!loanAmount || !tenure) return;
 
     const emi = calculateEMI(loanAmount, 10.97, tenure);
 
-    const formattedLoan = `₹${loanAmount.toLocaleString("en-IN")}`;
-    const formattedEMI = `₹${emi.toLocaleString("en-IN")}`;
-
     globals.functions.setProperty(
       globals.form.loan_offer_summary.avail_XPRESS_Personal_Loan_of,
-      { value: formattedLoan }
+      { value: `₹${loanAmount.toLocaleString("en-IN")}` }
     );
 
     globals.functions.setProperty(
       globals.form.loan_offer_summary.emi_Amount,
-      { value: formattedEMI }
+      { value: `₹${emi.toLocaleString("en-IN")}` }
     );
 
     globals.functions.setProperty(
