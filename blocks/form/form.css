@@ -1223,7 +1223,7 @@ main .form form select[multiple] {
 
 /* ===== LABEL ===== */
 .field-full-name-as-per-aadhaar .field-label {
-    font-size: 12px;
+    font-size: 15px;
     color: #6b6b6b;
     margin-bottom: 4px;
     display: block;
@@ -1236,7 +1236,7 @@ main .form form select[multiple] {
     border: none !important;
     outline: none !important;
     background: transparent !important;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
     color: #2d2d2d;
     padding: 0;
@@ -1252,4 +1252,76 @@ main .form form select[multiple] {
 /* ===== FORCE FULL WIDTH ===== */
 .field-full-name-as-per-aadhaar.col-12 {
     width: 100%;
+}
+
+/*======================= Address Details ===========================*/
+/* Fix container properly */
+.panel-wrapper.field-address-details {
+  background: #f3efff;
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+}
+/* Force legend inside */
+.panel-wrapper.field-address-details > legend {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+
+}
+.panel-wrapper.field-address-details::before {
+  content: "Address Details";
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #2f2f2f;
+
+  white-space: nowrap;      /* 🔥 prevents breaking */
+}
+
+/* Fix legend positioning (important) */
+.panel-wrapper.field-address-details > legend.field-label {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Optional: remove fieldset default border */
+.panel-wrapper.field-address-details {
+  border: none;
+}
+
+/* Input styling */
+.panel-wrapper.field-address-details input[type="text"] {
+  border: none;
+  border-left: 3px solid #6c5ce7;
+  background: transparent;
+  padding: 6px 10px;
+  font-size: 18px;
+  font-weight: 600;
+  width: 100%;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.panel-wrapper.field-address-details input[type="text"].has-value {
+  color: #2f2f2f;
+}
+
+/* Radio wrapper layout */
+.panel-wrapper.field-address-details .radio-wrapper {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 28px;
+  gap: 8px;
+}
+
+.radio-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }

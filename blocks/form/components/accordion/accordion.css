@@ -58,4 +58,128 @@ main .form fieldset.accordion  fieldset.accordion-collapse {
 main .form fieldset.accordion {
     row-gap: 0;
 }
+/*============= Full Name (As per PAN) ================================*/
+
+/* ===== Full Name Accordion Card ===== */
+.field-full-name-as-per-pan {
+  border-radius: 12px;
+  overflow: hidden; /* 🔥 important */
+  border: 1px solid #e6e9f5;
+  background: #fff;
+}
+
+/* ===== Header (top rounded only) ===== */
+.field-full-name-as-per-pan > legend {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* ===== Bottom corners rounding ===== */
+.field-full-name-as-per-pan > *:last-child {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/*==============personal details ===========================================*/
+/* ===== Accordion outer container ===== */
+.field-personal-details {
+  border-radius: 12px;
+  overflow: hidden; /* 🔥 important for rounded corners */
+  border: 1px solid #e6e9f5;
+}
+
+/* ===== Accordion header (top rounded only) ===== */
+.field-personal-details > legend {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* ===== Optional: inner spacing like Figma ===== */
+.field-personal-details > *:not(legend) {
+  padding: 15px;
+}
+/* ===== ONLY Personal Details panel ===== */
+.field-personal-details .field-wrapper.col-6 {
+  width: 95%;
+  display: inline-block;
+  vertical-align: top;
+  margin-bottom: 16px;
+}
+
+/* Inputs */
+.field-personal-details input,
+.field-personal-details select {
+  width: 100% !important;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #d6d9e6;
+  padding: 0 12px;
+  font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* Email field */
+/* ===== Email wrapper MUST control positioning ===== */
+.field-personal-details .field-user-email-id {
+  position: relative;
+}
+
+/* Input */
+.field-personal-details .field-user-email-id input {
+  width: 100% !important;
+  height: 40px;
+  padding-right: 80px; /* space for verify */
+  box-sizing: border-box;
+}
+
+/* ===== VERIFY BUTTON PERFECT ALIGNMENT ===== */
+.field-personal-details .email-verify-btn {
+  position: absolute;
+  right: 25px;
+
+  /* 🔥 key fix */
+  top: 60px; 
+  transform: translateY(-50%);
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  color: #5a78ff;
+  font-size: 18px;
+  font-weight: 600;
+
+  cursor: pointer;
+  padding: 0;
+}
+
+/* 🚫 remove hover background completely */
+.field-personal-details .email-verify-btn:hover,
+.field-personal-details .email-verify-btn:focus,
+.field-personal-details .email-verify-btn:active {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+/* ===== Suggestions (NOW PERFECT) ===== */
+.field-personal-details .email-suggestions-js {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* Chips */
+.field-personal-details .email-suggestions-js span {
+  padding: 6px 14px;
+  border-radius: 18px;
+  background: #f3f6ff;
+  color: #5a78ff;
+  font-size: 12px;
+  border: 1px solid #dbe2ff;
+  cursor: pointer;
+  white-space: nowrap;
+}
 
