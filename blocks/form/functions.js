@@ -143,7 +143,7 @@ function generateOTP(globals) {
     }
 
     if (!mobile || !identifierValue) {
-      console.log("Missing values ❌");
+      console.log("Missing values ");
       return;
     }
 
@@ -208,7 +208,7 @@ function generateOTP(globals) {
 function resendOTP(globals) {
   try {
     if (otpResendAttemptsLeft <= 0) {
-      console.log("No attempts left ❌");
+      console.log("No attempts left ");
       return;
     }
 
@@ -326,12 +326,12 @@ function validateOTP(globals) {
 
           globals.functions.setProperty(
             globals.form.otp_verification.otpValid,
-            { value: "OTP Verified ✅" }
+            { value: "OTP Verified " }
           );
         } else {
           globals.functions.setProperty(
             globals.form.otp_verification.otpValid,
-            { value: "Invalid OTP ❌" }
+            { value: "Invalid OTP " }
           );
         }
       });

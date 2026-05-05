@@ -14,31 +14,35 @@ export function handleAccordionNavigation(panel, tab, forceOpen = false) {
 
 /* ===== ADD VERIFY BUTTON ===== */
 function addVerifyButton(panel) {
-  const emailField = panel.querySelector('.field-personal-details .field-user-email-id');
-  if (!emailField) return;
+  const emailFields = panel.querySelectorAll(
+    '.field-user-email-id, .field-work-email-id'
+  );
 
-  const input = emailField.querySelector('input[type="email"]');
-  if (!input) return;
+  emailFields.forEach((emailField) => {
+    const input = emailField.querySelector('input[type="email"]');
+    if (!input) return;
 
-  if (emailField.querySelector('.email-verify-btn')) return;
+    // prevent duplicate
+    if (emailField.querySelector('.email-verify-btn')) return;
 
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'email-verify-btn';
-  btn.textContent = 'Verify';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'email-verify-btn';
+    btn.textContent = 'Verify';
 
-  // 🔥 important: insert immediately after input (not at end)
-  input.parentNode.appendChild(btn);
+    // ✅ append inside same wrapper
+    emailField.appendChild(btn);
 
-  btn.addEventListener('click', () => {
-    const email = input.value.trim();
+    btn.addEventListener('click', () => {
+      const email = input.value.trim();
 
-    if (!email) {
-      alert('Please enter email');
-      return;
-    }
+      if (!email) {
+        alert('Please enter email');
+        return;
+      }
 
-    console.log('Verify clicked:', email);
+      console.log('Verify clicked:', email);
+    });
   });
 }
 /* ===== EMAIL SUGGESTIONS VIA JS ===== */
