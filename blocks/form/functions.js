@@ -1,3 +1,6 @@
+let otpResendAttemptsLeft = 3;
+let otpTimerInterval = null;
+
 /**
  * Get Full Name
  * @name getFullName Concats first name and last name
@@ -56,17 +59,73 @@ function maskMobileNumber(mobileNumber) {
   return ` ${'*'.repeat(5)}${value.substring(5)}`;
 }
 
-/**
- * GENERATE OTP (DOB / PAN)
- * @param {scope} globals
- */
+/* =========================
+   HELPERS
+========================= */
+function updateAttemptsInfo(globals) {
+  const field = globals.form?.otp_verification?.attempts;
+
+  if (!field) return;
+
+  globals.functions.setProperty(field, {
+    value: `${otpResendAttemptsLeft}/3 attempts left`
+  });
+}
+
+/* =========================
+   OTP TIMER
+========================= */
+function startOtpTimer(globals) {
+  const timerField = globals.form?.otp_verification?.resendOTP;
+  const resendBtn = globals.form?.otp_verification?.resendOTP_btn;
+
+  if (!timerField) return;
+
+  let seconds = 10;
+
+  if (otpTimerInterval) {
+    clearInterval(otpTimerInterval);
+  }
+
+  globals.functions.setProperty(resendBtn, { enabled: false });
+
+  otpTimerInterval = setInterval(() => {
+    seconds--;
+
+    globals.functions.setProperty(timerField, {
+      value: `Resend OTP in ${seconds}s`
+    });
+
+    if (seconds <= 0) {
+      clearInterval(otpTimerInterval);
+
+      globals.functions.setProperty(timerField, {
+        value: "Resend OTP"
+      });
+
+      if (otpResendAttemptsLeft > 0) {
+        globals.functions.setProperty(resendBtn, { enabled: true });
+      }
+    }
+  }, 1000);
+
+  updateAttemptsInfo(globals);
+}
+
+function stopOtpTimer() {
+  if (otpTimerInterval) {
+    clearInterval(otpTimerInterval);
+    otpTimerInterval = null;
+  }
+}
+
+/* =========================
+   GENERATE OTP
+========================= */
 function generateOTP(globals) {
   try {
     const data = globals.functions.exportData();
 
-    console.log("FORM DATA:", data);
-
-    // ✅ FIXED HERE
     const mobile = data.aadhaar_linked_mobile_number || "";
     const dob = data.date_of_birth || "";
     const pan = data.pan_card || "";
@@ -82,10 +141,8 @@ function generateOTP(globals) {
       identifierValue = dob;
     }
 
-    console.log("FINAL DATA:", { mobile, identifierType, identifierValue });
-
     if (!mobile || !identifierValue) {
-      console.log("❌ Missing values");
+      console.log("Missing values ❌");
       return;
     }
 
@@ -104,20 +161,37 @@ function generateOTP(globals) {
     })
       .then(res => res.json())
       .then(data => {
-        console.log("OTP RESPONSE:", data);
-
         const otp = data?.responseString?.otpValue;
 
         if (otp) {
+          // show section
+          globals.functions.setProperty(
+            globals.form.otp_verification,
+            { visible: true }
+          );
+
+          // set OTP
           globals.functions.setProperty(
             globals.form.otp_verification.otp_Value,
             { value: otp }
           );
 
+          // clear validation
           globals.functions.setProperty(
-            globals.form.otp_verification,
-            { visible: true }
+            globals.form.otp_verification.otpValid,
+            { value: "" }
           );
+
+          // reset attempts
+          otpResendAttemptsLeft = 3;
+
+          globals.functions.setProperty(
+            globals.form.otp_verification.resendOTP_btn,
+            { enabled: false }
+          );
+
+          updateAttemptsInfo(globals);
+          startOtpTimer(globals);
         }
       });
 
@@ -125,16 +199,24 @@ function generateOTP(globals) {
     console.log("ERROR:", e);
   }
 }
-/**
- * VALIDATE OTP
- * @param {scope} globals
- */
-function validateOTP(globals) {
+
+/* =========================
+   RESEND OTP
+========================= */
+function resendOTP(globals) {
   try {
-    const mobile = globals.form.aadhaar_linked_mob?.value || "";
-    const dob = globals.form.date_of_birth?.value || "";
-    const pan = globals.form.pan_card?.value || "";
-    const otp = globals.form.otp_verification.otp_Value?.value || "";
+    if (otpResendAttemptsLeft <= 0) {
+      console.log("No attempts left ❌");
+      return;
+    }
+
+    otpResendAttemptsLeft--;
+
+    const data = globals.functions.exportData();
+
+    const mobile = data.aadhaar_linked_mobile_number || "";
+    const dob = data.date_of_birth || "";
+    const pan = data.pan_card || "";
 
     let identifierType = "";
     let identifierValue = "";
@@ -147,29 +229,98 @@ function validateOTP(globals) {
       identifierValue = dob;
     }
 
-    const payload = {
-      requestString: {
-        mobileNo: mobile,
-        identifierType,
-        identifierValue,
-        otpValue: otp
-      }
-    };
+    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/initiateCustomerIdentification", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        requestString: {
+          mobileNo: mobile,
+          identifierType,
+          identifierValue
+        }
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        const otp = data?.responseString?.otpValue;
+
+        globals.functions.setProperty(
+          globals.form.otp_verification.otp_Value,
+          { value: otp || "" }
+        );
+
+        globals.functions.setProperty(
+          globals.form.otp_verification.otpValid,
+          { value: "" }
+        );
+
+        globals.functions.setProperty(
+          globals.form.otp_verification.resendOTP_btn,
+          { enabled: false }
+        );
+
+        if (otpResendAttemptsLeft <= 0) {
+          globals.functions.setProperty(
+            globals.form.otp_verification.resendOTP_btn,
+            { enabled: false }
+          );
+        }
+
+        updateAttemptsInfo(globals);
+        startOtpTimer(globals);
+      });
+
+  } catch (e) {
+    console.log("RESEND ERROR:", e);
+  }
+}
+
+/* =========================
+   VALIDATE OTP
+========================= */
+function validateOTP(globals) {
+  try {
+    const data = globals.functions.exportData();
+
+    const mobile = data.aadhaar_linked_mobile_number || "";
+    const dob = data.date_of_birth || "";
+    const pan = data.pan_card || "";
+    const otp = data.otp_Value || "";
+
+    let identifierType = "";
+    let identifierValue = "";
+
+    if (pan) {
+      identifierType = "PAN";
+      identifierValue = pan;
+    } else {
+      identifierType = "DOB";
+      identifierValue = dob;
+    }
 
     fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/validateOtp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        requestString: {
+          mobileNo: mobile,
+          identifierType,
+          identifierValue,
+          otpValue: otp
+        }
+      })
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("VALIDATE RESPONSE:", data);
-
+      .then(res => res.json())
+      .then(data => {
         const isValid = data?.responseString?.otpValid;
 
         if (isValid === "Y") {
+          stopOtpTimer();
+
           globals.functions.setProperty(
             globals.form.otp_verification.otpValid,
             { value: "OTP Verified ✅" }
@@ -246,6 +397,10 @@ export {
   submitFormArrayToString,
   maskMobileNumber,
   generateOTP,
+  resendOTP,
   validateOTP,
+  startOtpTimer,
+  stopOtpTimer,
+  updateAttemptsInfo,
   updateValues
 };
