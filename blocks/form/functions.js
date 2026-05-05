@@ -61,17 +61,17 @@ function maskMobileNumber(mobileNumber) {
  * @param {scope} globals
  */
 function generateOTP(globals) {
-  if (!globals || !globals.form) {
-    console.log("Globals not received ❌");
-    return;
-  }
-
   try {
     console.log("Globals OK ✅");
 
-    const mobile = globals.form.aadhaar_linked_mob?.value || "";
-    const dob = globals.form.date_of_birth?.value || "";
-    const pan = globals.form.pan_card?.value || "";
+    // ✅ GET FULL FORM DATA
+    const data = globals.functions.exportData();
+
+    console.log("FORM DATA:", data);
+
+    const mobile = data.aadhaar_linked_mob || "";
+    const dob = data.date_of_birth || "";
+    const pan = data.pan_card || "";
 
     let identifierType = "";
     let identifierValue = "";
@@ -84,7 +84,12 @@ function generateOTP(globals) {
       identifierValue = dob;
     }
 
-    console.log("DATA:", { mobile, identifierType, identifierValue });
+    console.log("FINAL DATA:", { mobile, identifierType, identifierValue });
+
+    if (!mobile || !identifierValue) {
+      console.log("❌ Missing values");
+      return;
+    }
 
     fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/initiateCustomerIdentification", {
       method: "POST",
@@ -124,7 +129,6 @@ function generateOTP(globals) {
     console.log("ERROR:", e);
   }
 }
-
 /**
  * VALIDATE OTP
  * @param {scope} globals
