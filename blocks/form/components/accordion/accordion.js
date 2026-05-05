@@ -81,6 +81,12 @@ function showOtpField(emailField, input) {
   otpInput.placeholder = 'Enter OTP';
   otpInput.className = 'otp-input';
 
+  // 🔥 IMPORTANT FIXES
+  otpInput.setAttribute('autocomplete', 'one-time-code');
+  otpInput.setAttribute('inputmode', 'numeric');
+  otpInput.setAttribute('maxlength', '6');
+  otpInput.name = 'email_otp';
+
   const verifyBtn = document.createElement('button');
   verifyBtn.textContent = 'Submit OTP';
   verifyBtn.className = 'otp-submit-btn';
@@ -90,13 +96,19 @@ function showOtpField(emailField, input) {
 
   emailField.appendChild(container);
 
-  // ✅ VERIFY OTP (FIXED)
+  // ✅ VERIFY OTP
   verifyBtn.addEventListener('click', async () => {
     const otp = otpInput.value.trim();
     const email = input.value.trim();
 
     if (!otp) {
       alert('Please enter OTP');
+      return;
+    }
+
+    // 🔥 protect against overwritten email
+    if (!email.includes('@')) {
+      alert('Email invalid. Please verify again.');
       return;
     }
 
@@ -119,12 +131,10 @@ function showOtpField(emailField, input) {
 
       if (data?.responseString?.otpValid === "Y") {
 
-        // ✅ MARK VERIFIED
         window.emailVerified = true;
 
         alert('Email Verified ✅');
 
-        // ✅ update main verify button UI
         const mainBtn = emailField.querySelector('.email-verify-btn');
         if (mainBtn) {
           mainBtn.textContent = 'Verified';
@@ -132,7 +142,6 @@ function showOtpField(emailField, input) {
           mainBtn.disabled = true;
         }
 
-        // ✅ optional: disable OTP input
         otpInput.disabled = true;
         verifyBtn.disabled = true;
 
