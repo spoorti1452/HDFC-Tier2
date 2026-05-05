@@ -119,9 +119,10 @@ function stopOtpTimer() {
   }
 }
 
-/* =========================
-   GENERATE OTP
-========================= */
+/**
+ * GENERATE OTP
+ * @param {scope} globals
+ */
 function generateOTP(globals) {
   try {
     const data = globals.functions.exportData();
@@ -200,9 +201,10 @@ function generateOTP(globals) {
   }
 }
 
-/* =========================
-   RESEND OTP
-========================= */
+/**
+ * RESEND OTP
+ * @param {scope} globals
+ */
 function resendOTP(globals) {
   try {
     if (otpResendAttemptsLeft <= 0) {
@@ -277,9 +279,10 @@ function resendOTP(globals) {
   }
 }
 
-/* =========================
-   VALIDATE OTP
-========================= */
+/**
+ * VALIDATE OTP
+ * @param {scope} globals
+ */
 function validateOTP(globals) {
   try {
     const data = globals.functions.exportData();
