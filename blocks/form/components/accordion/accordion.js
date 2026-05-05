@@ -1,10 +1,12 @@
 export function handleAccordionNavigation(panel, tab, forceOpen = false) { 
   const accordionTabs = panel?.querySelectorAll(':scope > fieldset');
+
   accordionTabs.forEach((otherTab) => {
     if (otherTab !== tab) {
       otherTab.classList.add('accordion-collapse');
     }
   });
+
   if (forceOpen) {
     tab.classList.remove('accordion-collapse');
   } else {
@@ -31,12 +33,19 @@ function addVerifyButton(panel) {
 
     emailField.appendChild(btn);
 
-    // ✅ SEND OTP (THIS WAS MISSING)
+    /* ===== SEND OTP ===== */
     btn.addEventListener('click', async () => {
       const email = input.value.trim();
 
       if (!email) {
         alert('Please enter email');
+        return;
+      }
+
+      // ✅ EMAIL FORMAT CHECK
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Enter valid email');
         return;
       }
 
@@ -53,7 +62,14 @@ function addVerifyButton(panel) {
         const data = await res.json();
 
         if (data?.status?.responseCode === "0") {
+
           alert(`OTP sent: ${data.responseString.otpValue}`);
+
+          // 🔥 STORE EMAIL SAFELY (CRITICAL FIX)
+          emailField.setAttribute('data-email', email);
+
+          // 🔥 LOCK EMAIL FIELD
+          input.setAttribute('readonly', true);
 
           // 👉 CREATE OTP INPUT
           showOtpField(emailField, input);
@@ -70,6 +86,7 @@ function addVerifyButton(panel) {
   });
 }
 
+/* ===== OTP FIELD ===== */
 function showOtpField(emailField, input) {
   if (emailField.querySelector('.otp-container')) return;
 
@@ -85,7 +102,7 @@ function showOtpField(emailField, input) {
   otpInput.setAttribute('autocomplete', 'one-time-code');
   otpInput.setAttribute('inputmode', 'numeric');
   otpInput.setAttribute('maxlength', '6');
-  otpInput.name = 'email_otp';
+  otpInput.name = 'otp_input_unique'; // prevent AEM overwrite
 
   const verifyBtn = document.createElement('button');
   verifyBtn.textContent = 'Submit OTP';
@@ -96,18 +113,19 @@ function showOtpField(emailField, input) {
 
   emailField.appendChild(container);
 
-  // ✅ VERIFY OTP
+  /* ===== VERIFY OTP ===== */
   verifyBtn.addEventListener('click', async () => {
     const otp = otpInput.value.trim();
-    const email = input.value.trim();
+
+    // 🔥 ALWAYS GET ORIGINAL EMAIL (CRITICAL FIX)
+    const email = emailField.getAttribute('data-email');
 
     if (!otp) {
       alert('Please enter OTP');
       return;
     }
 
-    // 🔥 protect against overwritten email
-    if (!email.includes('@')) {
+    if (!email || !email.includes('@')) {
       alert('Email invalid. Please verify again.');
       return;
     }
@@ -131,10 +149,12 @@ function showOtpField(emailField, input) {
 
       if (data?.responseString?.otpValid === "Y") {
 
+        // ✅ GLOBAL FLAG
         window.emailVerified = true;
 
         alert('Email Verified ✅');
 
+        // ✅ UPDATE BUTTON UI
         const mainBtn = emailField.querySelector('.email-verify-btn');
         if (mainBtn) {
           mainBtn.textContent = 'Verified';
@@ -144,6 +164,9 @@ function showOtpField(emailField, input) {
 
         otpInput.disabled = true;
         verifyBtn.disabled = true;
+
+        // OPTIONAL: remove OTP field
+        // container.remove();
 
       } else {
         alert('Invalid OTP ❌');
@@ -155,7 +178,8 @@ function showOtpField(emailField, input) {
     }
   });
 }
-/* ===== EMAIL SUGGESTIONS VIA JS ===== */
+
+/* ===== EMAIL SUGGESTIONS ===== */
 function addEmailSuggestions(panel) {
   const emailFields = panel.querySelectorAll('.field-user-email-id');
 
@@ -164,7 +188,6 @@ function addEmailSuggestions(panel) {
     const input = emailField.querySelector('input[type="email"]');
 
     if (!wrapper || !input) return;
-
     if (wrapper.querySelector('.email-suggestions-js')) return;
 
     const container = document.createElement('div');
@@ -193,6 +216,7 @@ function addEmailSuggestions(panel) {
     wrapper.appendChild(container);
   });
 }
+
 /* ===== MAIN ===== */
 export default function decorate(panel) {
   panel.classList.add('accordion');
@@ -214,10 +238,11 @@ export default function decorate(panel) {
     });
   });
 
-setTimeout(() => {
-  addVerifyButton(panel);
-  addEmailSuggestions(panel);
-}, 300);
+  // 🔥 DELAY FOR AEM RENDER
+  setTimeout(() => {
+    addVerifyButton(panel);
+    addEmailSuggestions(panel);
+  }, 300);
 
   return panel;
 }
