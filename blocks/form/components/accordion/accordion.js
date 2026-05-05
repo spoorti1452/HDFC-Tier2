@@ -22,7 +22,6 @@ function addVerifyButton(panel) {
     const input = emailField.querySelector('input[type="email"]');
     if (!input) return;
 
-    // prevent duplicate
     if (emailField.querySelector('.email-verify-btn')) return;
 
     const btn = document.createElement('button');
@@ -30,80 +29,136 @@ function addVerifyButton(panel) {
     btn.className = 'email-verify-btn';
     btn.textContent = 'Verify';
 
-    // ✅ append inside same wrapper
     emailField.appendChild(btn);
-    verifyOtpBtn.addEventListener('click', async () => {
-  const otp = otpInput.value.trim();
-  const email = input.value.trim();
 
-  const res = await fetch(
-    'https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        otpValue: otp
-      })
+    // ✅ SEND OTP (THIS WAS MISSING)
+    btn.addEventListener('click', async () => {
+      const email = input.value.trim();
+
+      if (!email) {
+        alert('Please enter email');
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          'https://ricotta-overcook-abrasive.ngrok-free.dev/api/sendEmailOtp',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          }
+        );
+
+        const data = await res.json();
+
+        if (data?.status?.responseCode === "0") {
+          alert(`OTP sent: ${data.responseString.otpValue}`);
+
+          // 👉 CREATE OTP INPUT
+          showOtpField(emailField, input);
+
+        } else {
+          alert('Failed to send OTP');
+        }
+
+      } catch (e) {
+        console.error(e);
+        alert('API Error');
+      }
+    });
+  });
+}
+
+function showOtpField(emailField, input) {
+  if (emailField.querySelector('.otp-container')) return;
+
+  const container = document.createElement('div');
+  container.className = 'otp-container';
+
+  const otpInput = document.createElement('input');
+  otpInput.type = 'text';
+  otpInput.placeholder = 'Enter OTP';
+
+  const verifyBtn = document.createElement('button');
+  verifyBtn.textContent = 'Submit OTP';
+
+  container.appendChild(otpInput);
+  container.appendChild(verifyBtn);
+
+  emailField.appendChild(container);
+
+  // ✅ VERIFY OTP
+  verifyBtn.addEventListener('click', async () => {
+    const otp = otpInput.value.trim();
+    const email = input.value.trim();
+
+    const res = await fetch(
+      'https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otpValue: otp })
+      }
+    );
+
+    const data = await res.json();
+
+    if (data?.responseString?.otpValid === "Y") {
+
+      // ✅ THIS IS IMPORTANT
+      window.emailVerified = true;
+
+      alert('Email Verified ✅');
+
+      const btn = emailField.querySelector('.email-verify-btn');
+      btn.textContent = 'Verified';
+      btn.disabled = true;
+
+      container.remove();
+
+    } else {
+      alert('Invalid OTP ❌');
     }
-  );
-
-  const data = await res.json();
-
-  if (data?.responseString?.otpValid === "Y") {
-
-    // ✅ ADD HERE (THIS IS YOUR ANSWER)
-    window.emailVerified = true;
-
-    alert('Email Verified ✅');
-
-    const btn = emailField.querySelector('.email-verify-btn');
-    btn.textContent = 'Verified';
-    btn.style.color = 'green';
-    btn.disabled = true;
-
-  } else {
-    alert('Invalid OTP ❌');
-  }
-});
   });
 }
 /* ===== EMAIL SUGGESTIONS VIA JS ===== */
 function addEmailSuggestions(panel) {
-  const emailField = panel.querySelector('.field-personal-details .field-user-email-id');
-  if (!emailField) return;
+  const emailFields = panel.querySelectorAll('.field-user-email-id');
 
-  const wrapper = emailField.closest('.field-wrapper'); // 🔥 important
-  const input = emailField.querySelector('input[type="email"]');
-  if (!input || !wrapper) return;
+  emailFields.forEach((emailField) => {
+    const wrapper = emailField.closest('.field-wrapper');
+    const input = emailField.querySelector('input[type="email"]');
 
-  // prevent duplicate
-  if (wrapper.querySelector('.email-suggestions-js')) return;
+    if (!wrapper || !input) return;
 
-  const container = document.createElement('div');
-  container.className = 'email-suggestions-js';
+    if (wrapper.querySelector('.email-suggestions-js')) return;
 
-  const domains = ['@gmail.com', '@outlook.com', '@yahoo.com'];
+    const container = document.createElement('div');
+    container.className = 'email-suggestions-js';
 
-  domains.forEach((domain) => {
-    const chip = document.createElement('span');
-    chip.textContent = domain;
+    const domains = ['@gmail.com', '@outlook.com', '@yahoo.com'];
 
-    chip.addEventListener('click', () => {
-      let value = input.value;
+    domains.forEach((domain) => {
+      const chip = document.createElement('span');
+      chip.textContent = domain;
 
-      if (value.includes('@')) {
-        value = value.split('@')[0];
-      }
+      chip.addEventListener('click', () => {
+        let value = input.value;
 
-      input.value = value + domain;
-      input.focus();
+        if (value.includes('@')) {
+          value = value.split('@')[0];
+        }
+
+        input.value = value + domain;
+        input.focus();
+      });
+
+      container.appendChild(chip);
     });
 
-    container.appendChild(chip);
+    wrapper.appendChild(container);
   });
-
-  wrapper.appendChild(container); // ✅ FIXED
 }
 /* ===== MAIN ===== */
 export default function decorate(panel) {
@@ -126,11 +181,10 @@ export default function decorate(panel) {
     });
   });
 
-  /* inject verify button */
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     addVerifyButton(panel);
-     addEmailSuggestions(panel);
-  }, 0);
+    addEmailSuggestions(panel);
+  });
 
   return panel;
 }
