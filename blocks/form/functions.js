@@ -61,20 +61,21 @@ function maskMobileNumber(mobileNumber) {
  * @param {scope} globals
  */
 function generateOTP(globals) {
+  if (!globals || !globals.form) {
+    console.log("Globals not received ❌");
+    return;
+  }
+
   try {
-    const mobile =
-      globals.form.aadhaar_linked_mob?.value || "";
+    console.log("Globals OK ✅");
 
-    const dob =
-      globals.form.date_of_birth?.value || "";
-
-    const pan =
-      globals.form.pan_card?.value || "";
+    const mobile = globals.form.aadhaar_linked_mob?.value || "";
+    const dob = globals.form.date_of_birth?.value || "";
+    const pan = globals.form.pan_card?.value || "";
 
     let identifierType = "";
     let identifierValue = "";
 
-    // ✅ Decide based on which field has value
     if (pan) {
       identifierType = "PAN";
       identifierValue = pan;
@@ -83,47 +84,41 @@ function generateOTP(globals) {
       identifierValue = dob;
     }
 
-    if (!mobile || !identifierValue) {
-      console.log("Missing data");
-      return;
-    }
-
-    const payload = {
-      requestString: {
-        mobileNo: mobile,
-        identifierType,
-        identifierValue
-      }
-    };
+    console.log("DATA:", { mobile, identifierType, identifierValue });
 
     fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/initiateCustomerIdentification", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        requestString: {
+          mobileNo: mobile,
+          identifierType,
+          identifierValue
+        }
+      })
     })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         console.log("OTP RESPONSE:", data);
 
         const otp = data?.responseString?.otpValue;
 
         if (otp) {
-          // ✅ AUTO FILL OTP FIELD
+          console.log("SETTING OTP:", otp);
+
           globals.functions.setProperty(
             globals.form.otp_verification.otp_Value,
             { value: otp }
           );
 
-          // ✅ MOVE TO OTP SECTION (OPTIONAL)
           globals.functions.setProperty(
             globals.form.otp_verification,
             { visible: true }
           );
         }
-      })
-      .catch((err) => console.log("OTP ERROR:", err));
+      });
 
   } catch (e) {
     console.log("ERROR:", e);
