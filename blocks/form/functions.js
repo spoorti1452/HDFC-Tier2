@@ -62,14 +62,12 @@ function maskMobileNumber(mobileNumber) {
  */
 function generateOTP(globals) {
   try {
-    console.log("Globals OK ✅");
-
-    // ✅ GET FULL FORM DATA
     const data = globals.functions.exportData();
 
     console.log("FORM DATA:", data);
 
-    const mobile = data.aadhaar_linked_mob || "";
+    // ✅ FIXED HERE
+    const mobile = data.aadhaar_linked_mobile_number || "";
     const dob = data.date_of_birth || "";
     const pan = data.pan_card || "";
 
@@ -111,8 +109,6 @@ function generateOTP(globals) {
         const otp = data?.responseString?.otpValue;
 
         if (otp) {
-          console.log("SETTING OTP:", otp);
-
           globals.functions.setProperty(
             globals.form.otp_verification.otp_Value,
             { value: otp }
