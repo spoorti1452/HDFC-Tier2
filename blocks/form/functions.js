@@ -342,6 +342,150 @@ function validateOTP(globals) {
 }
 
 /**
+ * SEND EMAIL OTP FUNCTION (AEM EDS COMPATIBLE)
+ * @param {scope} globals
+ */
+function sendEmailOTP(globals) {
+  try {
+    const data = globals.functions.exportData();
+
+    const email = data.work_email_id || "";
+
+    if (!email) {
+      alert("Enter email");
+      return;
+    }
+
+    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/sendEmailOtp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email
+      })
+    })
+      .then(res => res.json())
+      .then(res => {
+        const otp = res?.responseString?.otpValue;
+
+        if (otp) {
+          console.log("EMAIL OTP:", otp);
+
+          // 🔥 OPTIONAL → show OTP in form (for testing)
+          globals.functions.setProperty(
+            globals.form.emp_details.work_email_id_panel.email_otp,
+            { value: otp }
+          );
+
+          globals.functions.setProperty(
+            globals.form.emp_details.work_email_id_panel.email_otp_status,
+            { value: "" }
+          );
+        }
+      });
+
+  } catch (e) {
+    console.log("EMAIL OTP ERROR:", e);
+  }
+}
+
+/**
+ * VERIFY EMAIL OTP FUNCTION (AEM EDS COMPATIBLE)
+ * @param {scope} globals
+ */
+function verifyEmailOTP(globals) {
+  try {
+    const data = globals.functions.exportData();
+
+    const email = data.work_email_id || "";
+    const otp = data.email_otp || "";
+
+    if (!email || !otp) {
+      alert("Enter OTP");
+      return;
+    }
+
+    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        otpValue: otp
+      })
+    })
+      .then(res => res.json())
+      .then(res => {
+        const valid = res?.responseString?.otpValid;
+
+        if (valid === "Y") {
+          globals.functions.setProperty(
+            globals.form.emp_details.work_email_id_panel.email_otp_status,
+            { value: "Email Verified " }
+          );
+
+          // 🔥 disable verify button
+          globals.functions.setProperty(
+            globals.form.emp_details.work_email_id_panel.verify_btn,
+            { enabled: false }
+          );
+
+        } else {
+          globals.functions.setProperty(
+            globals.form.emp_details.work_email_id_panel.email_otp_status,
+            { value: "Invalid OTP " }
+          );
+        }
+      });
+
+  } catch (e) {
+    console.log("VERIFY EMAIL ERROR:", e);
+  }
+}
+
+/**
+ * SAVE CUSTOMER DETAILS FUNCTION (AEM EDS COMPATIBLE)
+ * @param {scope} globals
+ */
+function submitCustomerDetails(globals) {
+  try {
+    const data = globals.functions.exportData();
+
+    const payload = {
+      firstName: data.pan_first_name || "",
+      middleName: data.pan_middle_name || "",
+      lastName: data.pan_last_name || "",
+      address: data.address_as_per_aadhaar_records || "",
+      income: data.monthly_net_income_salary || "",
+      email: data.work_email_id || ""
+    };
+
+    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/saveCustomerDetails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (res?.status?.responseCode === "0") {
+          alert("Customer Saved Successfully ");
+
+          console.log("Saved Data:", res.responseString.customer);
+        } else {
+          alert("Save Failed ");
+        }
+      });
+
+  } catch (e) {
+    console.log("SAVE ERROR:", e);
+  }
+}
+
+/**
  * EMI CALCULATION FUNCTION (AEM EDS COMPATIBLE)
  * @param {scope} globals
  */
@@ -405,5 +549,8 @@ export {
   startOtpTimer,
   stopOtpTimer,
   updateAttemptsInfo,
+  sendEmailOTP,
+  verifyEmailOTP,
+  submitCustomerDetails,
   updateValues
 };
