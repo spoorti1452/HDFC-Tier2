@@ -1277,7 +1277,7 @@ main .form form select[multiple] {
   margin-bottom: 16px;
   color: #2f2f2f;
 
-  white-space: nowrap;      /* 🔥 prevents breaking */
+  white-space: nowrap;    
 }
 
 /* Fix legend positioning (important) */

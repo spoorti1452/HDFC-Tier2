@@ -57,6 +57,142 @@ function maskMobileNumber(mobileNumber) {
 }
 
 /**
+ * GENERATE OTP (DOB / PAN)
+ * @param {scope} globals
+ */
+function generateOTP(globals) {
+  try {
+    const mobile =
+      globals.form.aadhaar_linked_mob?.value || "";
+
+    const dob =
+      globals.form.date_of_birth?.value || "";
+
+    const pan =
+      globals.form.pan_card?.value || "";
+
+    let identifierType = "";
+    let identifierValue = "";
+
+    // ✅ Decide based on which field has value
+    if (pan) {
+      identifierType = "PAN";
+      identifierValue = pan;
+    } else {
+      identifierType = "DOB";
+      identifierValue = dob;
+    }
+
+    if (!mobile || !identifierValue) {
+      console.log("Missing data");
+      return;
+    }
+
+    const payload = {
+      requestString: {
+        mobileNo: mobile,
+        identifierType,
+        identifierValue
+      }
+    };
+
+    fetch("https://YOUR_NGROK_URL/api/initiateCustomerIdentification", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("OTP RESPONSE:", data);
+
+        const otp = data?.responseString?.otpValue;
+
+        if (otp) {
+          // ✅ AUTO FILL OTP FIELD
+          globals.functions.setProperty(
+            globals.form.otp_verification.otp_Value,
+            { value: otp }
+          );
+
+          // ✅ MOVE TO OTP SECTION (OPTIONAL)
+          globals.functions.setProperty(
+            globals.form.otp_verification,
+            { visible: true }
+          );
+        }
+      })
+      .catch((err) => console.log("OTP ERROR:", err));
+
+  } catch (e) {
+    console.log("ERROR:", e);
+  }
+}
+
+/**
+ * VALIDATE OTP
+ * @param {scope} globals
+ */
+function validateOTP(globals) {
+  try {
+    const mobile = globals.form.aadhaar_linked_mob?.value || "";
+    const dob = globals.form.date_of_birth?.value || "";
+    const pan = globals.form.pan_card?.value || "";
+    const otp = globals.form.otp_verification.otp_Value?.value || "";
+
+    let identifierType = "";
+    let identifierValue = "";
+
+    if (pan) {
+      identifierType = "PAN";
+      identifierValue = pan;
+    } else {
+      identifierType = "DOB";
+      identifierValue = dob;
+    }
+
+    const payload = {
+      requestString: {
+        mobileNo: mobile,
+        identifierType,
+        identifierValue,
+        otpValue: otp
+      }
+    };
+
+    fetch("https://YOUR_NGROK_URL/api/validateOtp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("VALIDATE RESPONSE:", data);
+
+        const isValid = data?.responseString?.otpValid;
+
+        if (isValid === "Y") {
+          globals.functions.setProperty(
+            globals.form.otp_verification.otpValid,
+            { value: "OTP Verified ✅" }
+          );
+        } else {
+          globals.functions.setProperty(
+            globals.form.otp_verification.otpValid,
+            { value: "Invalid OTP ❌" }
+          );
+        }
+      });
+
+  } catch (e) {
+    console.log("VALIDATE ERROR:", e);
+  }
+}
+
+/**
  * EMI CALCULATION FUNCTION (AEM EDS COMPATIBLE)
  * @param {scope} globals
  */
@@ -114,5 +250,7 @@ export {
   days,
   submitFormArrayToString,
   maskMobileNumber,
+  generateOTP,
+  validateOTP,
   updateValues
 };
