@@ -451,6 +451,13 @@ function verifyEmailOTP(globals) {
  */
 function submitCustomerDetails(globals) {
   try {
+
+    // ✅ ADD HERE (VERY IMPORTANT)
+    if (!window.emailVerified) {
+      alert("Please verify email first");
+      return;
+    }
+
     const data = globals.functions.exportData();
 
     const payload = {
@@ -473,8 +480,6 @@ function submitCustomerDetails(globals) {
       .then(res => {
         if (res?.status?.responseCode === "0") {
           alert("Customer Saved Successfully ");
-
-          console.log("Saved Data:", res.responseString.customer);
         } else {
           alert("Save Failed ");
         }
@@ -484,7 +489,6 @@ function submitCustomerDetails(globals) {
     console.log("SAVE ERROR:", e);
   }
 }
-
 /**
  * EMI CALCULATION FUNCTION (AEM EDS COMPATIBLE)
  * @param {scope} globals

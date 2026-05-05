@@ -32,17 +32,40 @@ function addVerifyButton(panel) {
 
     // ✅ append inside same wrapper
     emailField.appendChild(btn);
+    verifyOtpBtn.addEventListener('click', async () => {
+  const otp = otpInput.value.trim();
+  const email = input.value.trim();
 
-    btn.addEventListener('click', () => {
-      const email = input.value.trim();
+  const res = await fetch(
+    'https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        otpValue: otp
+      })
+    }
+  );
 
-      if (!email) {
-        alert('Please enter email');
-        return;
-      }
+  const data = await res.json();
 
-      console.log('Verify clicked:', email);
-    });
+  if (data?.responseString?.otpValid === "Y") {
+
+    // ✅ ADD HERE (THIS IS YOUR ANSWER)
+    window.emailVerified = true;
+
+    alert('Email Verified ✅');
+
+    const btn = emailField.querySelector('.email-verify-btn');
+    btn.textContent = 'Verified';
+    btn.style.color = 'green';
+    btn.disabled = true;
+
+  } else {
+    alert('Invalid OTP ❌');
+  }
+});
   });
 }
 /* ===== EMAIL SUGGESTIONS VIA JS ===== */
