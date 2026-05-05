@@ -96,7 +96,7 @@ function generateOTP(globals) {
       }
     };
 
-    fetch("https://YOUR_NGROK_URL/api/initiateCustomerIdentification", {
+    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/initiateCustomerIdentification", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -161,7 +161,7 @@ function validateOTP(globals) {
       }
     };
 
-    fetch("https://YOUR_NGROK_URL/api/validateOtp", {
+    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/validateOtp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
