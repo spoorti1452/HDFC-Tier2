@@ -79,57 +79,72 @@ function showOtpField(emailField, input) {
   const otpInput = document.createElement('input');
   otpInput.type = 'text';
   otpInput.placeholder = 'Enter OTP';
+  otpInput.className = 'otp-input';
 
   const verifyBtn = document.createElement('button');
   verifyBtn.textContent = 'Submit OTP';
+  verifyBtn.className = 'otp-submit-btn';
 
   container.appendChild(otpInput);
   container.appendChild(verifyBtn);
 
   emailField.appendChild(container);
 
-  // ✅ VERIFY OTP
-  btn.addEventListener('click', async () => {
-  const email = input.value.trim();
+  // ✅ VERIFY OTP (FIXED)
+  verifyBtn.addEventListener('click', async () => {
+    const otp = otpInput.value.trim();
+    const email = input.value.trim();
 
-  if (!email) {
-    alert('Please enter email');
-    return;
-  }
-
-  try {
-    const res = await fetch(
-      'https://ricotta-overcook-abrasive.ngrok-free.dev/api/sendEmailOtp',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email })
-      }
-    );
-
-    const data = await res.json();
-
-    if (data?.status?.responseCode === "0") {
-
-      alert(`OTP sent: ${data.responseString.otpValue}`);
-
-      // ✅ ADD HERE (VERY IMPORTANT)
-      input.disabled = true;
-
-      // show OTP field
-      showOtpField(emailField, input);
-
-    } else {
-      alert('Failed to send OTP');
+    if (!otp) {
+      alert('Please enter OTP');
+      return;
     }
 
-  } catch (e) {
-    console.error(e);
-    alert('API Error');
-  }
-});
+    try {
+      const res = await fetch(
+        'https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            otpValue: otp
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      if (data?.responseString?.otpValid === "Y") {
+
+        // ✅ MARK VERIFIED
+        window.emailVerified = true;
+
+        alert('Email Verified ✅');
+
+        // ✅ update main verify button UI
+        const mainBtn = emailField.querySelector('.email-verify-btn');
+        if (mainBtn) {
+          mainBtn.textContent = 'Verified';
+          mainBtn.style.color = 'green';
+          mainBtn.disabled = true;
+        }
+
+        // ✅ optional: disable OTP input
+        otpInput.disabled = true;
+        verifyBtn.disabled = true;
+
+      } else {
+        alert('Invalid OTP ❌');
+      }
+
+    } catch (e) {
+      console.error(e);
+      alert('Verify API Error');
+    }
+  });
 }
 /* ===== EMAIL SUGGESTIONS VIA JS ===== */
 function addEmailSuggestions(panel) {
@@ -190,10 +205,10 @@ export default function decorate(panel) {
     });
   });
 
-  requestAnimationFrame(() => {
-    addVerifyButton(panel);
-    addEmailSuggestions(panel);
-  });
+setTimeout(() => {
+  addVerifyButton(panel);
+  addEmailSuggestions(panel);
+}, 300);
 
   return panel;
 }
