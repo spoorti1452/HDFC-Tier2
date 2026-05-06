@@ -283,6 +283,10 @@ function resendOTP(globals) {
  * VALIDATE OTP
  * @param {scope} globals
  */
+/**
+ * VALIDATE OTP
+ * @param {scope} globals
+ */
 function validateOTP(globals) {
   try {
     const data = globals.functions.exportData();
@@ -318,20 +322,54 @@ function validateOTP(globals) {
       })
     })
       .then(res => res.json())
-      .then(data => {
-        const isValid = data?.responseString?.otpValid;
+      .then(response => {
+
+        const isValid =
+          response?.responseString?.otpValid;
 
         if (isValid === "Y") {
+
           stopOtpTimer();
+
+          // ✅ OTP VALID MESSAGE
+          globals.functions.setProperty(
+            globals.form.otp_verification.otpValid,
+            { value: "OTP Verified" }
+          );
+
+          // ✅ GET CUSTOMER DETAILS
+          const customer =
+            response?.responseString?.customerDetails || {};
+
+          const fullName =
+            customer.fullName || "";
+
+          const address =
+            customer.address || "";
+
+          // ✅ SET FULL NAME
+          globals.functions.setProperty(
+            globals.form.details.customer_details.full_name,
+            { value: fullName }
+          );
+
+          // ✅ SET ADDRESS
+          globals.functions.setProperty(
+            globals.form.details.customer_details.address_details.address_as_per_aadhaar_records,
+            { value: address }
+          );
+
+          // ✅ SHOW DETAILS PANEL
+          globals.functions.setProperty(
+            globals.form.details,
+            { visible: true }
+          );
+
+        } else {
 
           globals.functions.setProperty(
             globals.form.otp_verification.otpValid,
-            { value: "OTP Verified " }
-          );
-        } else {
-          globals.functions.setProperty(
-            globals.form.otp_verification.otpValid,
-            { value: "Invalid OTP " }
+            { value: "Invalid OTP" }
           );
         }
       });
