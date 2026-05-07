@@ -992,3 +992,50 @@ main .form fieldset.accordion {
 .form .accordion > fieldset.panel-wrapper:last-child {
   margin-bottom: 0 !important;
 }
+
+/*=====================================================================================*/
+/* ===== OTP CONTAINER ===== */
+
+.field-personal-details .otp-container {
+  width: 100%;
+  display: block;
+  margin-top: 16px;
+  clear: both;
+}
+
+/* OTP INPUT */
+
+.field-personal-details .otp-input {
+  width: 100%;
+  max-width: 520px;
+  height: 42px;
+
+  border: 1px solid #d6d9e6;
+  border-radius: 8px;
+
+  padding: 0 12px;
+  font-size: 14px;
+
+  box-sizing: border-box;
+  background: #fff;
+}
+
+/* SUBMIT BUTTON */
+
+.field-personal-details .otp-submit-btn {
+  margin-top: 14px;
+
+  width: 220px;
+  height: 48px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #5d86d9;
+  color: #fff;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
