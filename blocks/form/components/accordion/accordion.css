@@ -427,12 +427,11 @@ main .form fieldset.accordion {
   max-width: unset !important;
   flex: unset !important;
 }
-
 /* =========================
-   PERSONAL DETAILS
+   PERSONAL ACCORDION
    ========================= */
 
-.form .field-personal-details {
+.form .field-personal-accordion {
   width: 100%;
   border: 1px solid #e5e9f2;
   border-radius: 14px;
@@ -449,7 +448,7 @@ main .form fieldset.accordion {
    HEADER
    ========================= */
 
-.form .field-personal-details > legend {
+.form .field-personal-accordion > legend {
   grid-column: 1 / -1;
 
   background: #e4e8f1;
@@ -467,7 +466,7 @@ main .form fieldset.accordion {
    FIELD WRAPPER
    ========================= */
 
-.form .field-personal-details > .field-wrapper {
+.form .field-personal-accordion > .field-wrapper {
   position: relative;
 
   padding-left: 10px;
@@ -481,7 +480,7 @@ main .form fieldset.accordion {
    BLUE LEFT BAR
    ========================= */
 
-.form .field-personal-details > .field-wrapper::before {
+.form .field-personal-accordion > .field-wrapper::before {
   content: "";
 
   position: absolute;
@@ -500,7 +499,7 @@ main .form fieldset.accordion {
    LABEL
    ========================= */
 
-.form .field-personal-details label {
+.form .field-personal-accordion label {
   display: block;
 
   margin-bottom: 8px;
@@ -514,9 +513,9 @@ main .form fieldset.accordion {
    INPUT STYLE
    ========================= */
 
-.form .field-personal-details input,
-.form .field-personal-details select,
-.form .field-personal-details textarea {
+.form .field-personal-accordion input,
+.form .field-personal-accordion select,
+.form .field-personal-accordion textarea {
   width: 100%;
 
   border: 0 !important;
@@ -538,11 +537,13 @@ main .form fieldset.accordion {
   cursor: text;
 }
 
-/* REMOVE INPUT BOX UI */
+/* =========================
+   REMOVE INPUT BOX UI
+   ========================= */
 
-.form .field-personal-details .text-wrapper,
-.form .field-personal-details .number-wrapper,
-.form .field-personal-details .date-wrapper {
+.form .field-personal-accordion .text-wrapper,
+.form .field-personal-accordion .number-wrapper,
+.form .field-personal-accordion .date-wrapper {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -552,8 +553,8 @@ main .form fieldset.accordion {
    FULL WIDTH FIELDS
    ========================= */
 
-.form .field-personal-details .field-current-address,
-.form .field-personal-details .field-residence-type {
+.form .field-personal-accordion .field-current-address,
+.form .field-personal-accordion .field-residence-type {
   grid-column: 1 / -1;
 }
 
@@ -561,11 +562,39 @@ main .form fieldset.accordion {
    REMOVE AEM WIDTH ISSUE
    ========================= */
 
-.form .field-personal-details .col-3,
-.form .field-personal-details .col-12 {
+.form .field-personal-accordion .col-3,
+.form .field-personal-accordion .col-12 {
   width: auto !important;
   max-width: unset !important;
   flex: unset !important;
+}
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 991px) {
+
+  .form .field-personal-accordion {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form .field-personal-accordion .field-current-address,
+  .form .field-personal-accordion .field-residence-type {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+
+  .form .field-personal-accordion {
+    grid-template-columns: 1fr;
+  }
+
+  .form .field-personal-accordion > legend {
+    padding: 18px;
+    font-size: 16px;
+  }
 }
 
 /* =========================
