@@ -114,7 +114,7 @@ function showOtpField(emailField, input) {
   container.appendChild(verifyBtn);
 
   // APPEND OUTSIDE EMAIL FIELD
-  emailField.parentElement.appendChild(container);
+  emailField.closest('.field-wrapper').appendChild(container);
 
   verifyBtn.addEventListener('click', async () => {
     const otp = otpInput.value.trim();

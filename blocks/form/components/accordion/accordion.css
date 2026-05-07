@@ -994,24 +994,48 @@ main .form fieldset.accordion {
 }
 
 /*=====================================================================================*/
-.field-personal-details {
-  display: flex;
-  flex-direction: column;
-}
+/* ===== OTP CONTAINER ===== */
 
 .field-personal-details .otp-container {
-  width: 100%;
   display: block;
-  clear: both;
+  width: 100%;
   margin-top: 16px;
+  clear: both;
 }
 
+/* OTP INPUT */
+
 .field-personal-details .otp-input {
-  width: 100%;
-  max-width: 520px;
+  display: block;
+  width: 520px;
+  max-width: 100%;
+  height: 42px;
+
+  border: 1px solid #d6d9e6;
+  border-radius: 8px;
+
+  padding: 0 12px;
+  box-sizing: border-box;
 }
+
+/* BUTTON */
 
 .field-personal-details .otp-submit-btn {
   display: block;
+
   margin-top: 14px;
+
+  width: 220px;
+  height: 48px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #5d86d9;
+  color: white;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
 }
