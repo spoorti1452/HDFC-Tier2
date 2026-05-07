@@ -42,7 +42,6 @@ function addVerifyButton(panel) {
         return;
       }
 
-      // ✅ EMAIL FORMAT CHECK
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         alert('Enter valid email');
@@ -65,13 +64,10 @@ function addVerifyButton(panel) {
 
           alert(`OTP sent: ${data.responseString.otpValue}`);
 
-          // 🔥 STORE EMAIL SAFELY (CRITICAL FIX)
           emailField.setAttribute('data-email', email);
 
-          // 🔥 LOCK EMAIL FIELD
           input.setAttribute('readonly', true);
 
-          // 👉 CREATE OTP INPUT
           showOtpField(emailField, input);
 
         } else {
@@ -98,7 +94,6 @@ function showOtpField(emailField, input) {
   otpInput.placeholder = 'Enter OTP';
   otpInput.className = 'otp-input';
 
-  // 🔥 IMPORTANT FIXES
   otpInput.setAttribute('autocomplete', 'one-time-code');
   otpInput.setAttribute('inputmode', 'numeric');
   otpInput.setAttribute('maxlength', '6');
@@ -117,7 +112,6 @@ function showOtpField(emailField, input) {
   verifyBtn.addEventListener('click', async () => {
     const otp = otpInput.value.trim();
 
-    // 🔥 ALWAYS GET ORIGINAL EMAIL (CRITICAL FIX)
     const email = emailField.getAttribute('data-email');
 
     if (!otp) {
@@ -149,12 +143,10 @@ function showOtpField(emailField, input) {
 
       if (data?.responseString?.otpValid === "Y") {
 
-        // ✅ GLOBAL FLAG
         window.emailVerified = true;
 
-        alert('Email Verified ✅');
+        alert('Email Verified');
 
-        // ✅ UPDATE BUTTON UI
         const mainBtn = emailField.querySelector('.email-verify-btn');
         if (mainBtn) {
           mainBtn.textContent = 'Verified';
@@ -169,7 +161,7 @@ function showOtpField(emailField, input) {
         // container.remove();
 
       } else {
-        alert('Invalid OTP ❌');
+        alert('Invalid OTP');
       }
 
     } catch (e) {
