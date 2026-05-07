@@ -83,40 +83,52 @@ function addVerifyButton(panel) {
 }
 
 /* ===== OTP FIELD ===== */
+/* ===== OTP FIELD ===== */
 function showOtpField(emailField, input) {
+
+  // prevent duplicate OTP field
   if (emailField.querySelector('.otp-container')) return;
 
+  /* ===== OTP CONTAINER ===== */
   const container = document.createElement('div');
   container.className = 'otp-container';
 
+  /* ===== OTP INPUT ===== */
   const otpInput = document.createElement('input');
+
   otpInput.type = 'text';
   otpInput.placeholder = 'Enter OTP';
   otpInput.className = 'otp-input';
 
-  otpInput.setAttribute('autocomplete', 'one-time-code');
+  // IMPORTANT FOR AEM
+  otpInput.setAttribute('autocomplete', 'off');
+  otpInput.setAttribute('data-ignore', 'true');
+  otpInput.setAttribute('data-aem-ignore', 'true');
+
   otpInput.setAttribute('inputmode', 'numeric');
   otpInput.setAttribute('maxlength', '6');
 
-  // IMPORTANT
-  otpInput.setAttribute('data-ignore', 'true');
-  otpInput.setAttribute('autocomplete', 'off');
+  // remove AEM binding
+  otpInput.removeAttribute('name');
+  otpInput.removeAttribute('id');
 
-  // REMOVE name attribute completely
-  // otpInput.name = 'otp_input_unique';
-
+  /* ===== SUBMIT BUTTON ===== */
   const verifyBtn = document.createElement('button');
+
+  verifyBtn.type = 'button';
   verifyBtn.textContent = 'Submit OTP';
   verifyBtn.className = 'otp-submit-btn';
-  verifyBtn.type = 'button';
 
+  /* ===== APPEND ===== */
   container.appendChild(otpInput);
   container.appendChild(verifyBtn);
 
-  // APPEND OUTSIDE EMAIL FIELD
+  // append INSIDE email wrapper
   emailField.appendChild(container);
 
+  /* ===== VERIFY OTP ===== */
   verifyBtn.addEventListener('click', async () => {
+
     const otp = otpInput.value.trim();
 
     const email = emailField.getAttribute('data-email');
@@ -127,6 +139,7 @@ function showOtpField(emailField, input) {
     }
 
     try {
+
       const res = await fetch(
         'https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp',
         {
@@ -163,12 +176,15 @@ function showOtpField(emailField, input) {
       }
 
     } catch (e) {
+
       console.error(e);
       alert('Verify API Error');
-    }
-  });
-}
 
+    }
+
+  });
+
+}
 /* ===== EMAIL SUGGESTIONS ===== */
 function addEmailSuggestions(panel) {
   const emailFields = panel.querySelectorAll('.field-user-email-id');
