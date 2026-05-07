@@ -84,7 +84,7 @@ function addVerifyButton(panel) {
 
 /* ===== OTP FIELD ===== */
 function showOtpField(emailField, input) {
-  if (emailField.parentElement.querySelector('.otp-container')) return;
+  if (emailField.querySelector('.otp-container')) return;
 
   const container = document.createElement('div');
   container.className = 'otp-container';
@@ -114,7 +114,7 @@ function showOtpField(emailField, input) {
   container.appendChild(verifyBtn);
 
   // APPEND OUTSIDE EMAIL FIELD
-  emailField.closest('.field-wrapper').appendChild(container);
+  emailField.appendChild(container);
 
   verifyBtn.addEventListener('click', async () => {
     const otp = otpInput.value.trim();
