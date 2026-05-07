@@ -43,6 +43,10 @@ function formatValue(input, actualValue) {
    GET INTERPOLATED VALUE
    (MIDDLE VALUES SUPPORT)
 ========================= */
+/* =========================
+   GET ACTUAL VALUE
+   (SMOOTH + EXACT VALUES)
+========================= */
 function getActualValue(input, percent) {
 
   /* =========================
@@ -50,14 +54,38 @@ function getActualValue(input, percent) {
   ========================= */
   if (input.name === "loanAmount") {
 
-    const min = 50000;
-    const max = 1500000;
+    const values = AMOUNT_VALUES;
 
-    // ✅ SMOOTH VALUES
+    const segmentSize =
+      100 / (values.length - 1);
+
+    // current segment
+    const segmentIndex =
+      Math.floor(percent / segmentSize);
+
+    // prevent overflow
+    const safeIndex =
+      Math.min(
+        segmentIndex,
+        values.length - 2
+      );
+
+    const start =
+      values[safeIndex];
+
+    const end =
+      values[safeIndex + 1];
+
+    // progress inside segment
+    const segmentProgress =
+      (percent - (safeIndex * segmentSize))
+      / segmentSize;
+
+    // interpolate
     const value =
-      min + ((max - min) * percent / 100);
+      start + ((end - start) * segmentProgress);
 
-    // ✅ ROUND TO NEAREST 10K
+    // nearest 10K
     return Math.round(value / 10000) * 10000;
   }
 
@@ -66,18 +94,38 @@ function getActualValue(input, percent) {
   ========================= */
   if (input.name === "loanTenure") {
 
-    const min = 12;
-    const max = 84;
+    const values = TENURE_VALUES;
 
-    // ✅ ROUND TO WHOLE MONTH
-    return Math.round(
-      min + ((max - min) * percent / 100)
-    );
+    const segmentSize =
+      100 / (values.length - 1);
+
+    const segmentIndex =
+      Math.floor(percent / segmentSize);
+
+    const safeIndex =
+      Math.min(
+        segmentIndex,
+        values.length - 2
+      );
+
+    const start =
+      values[safeIndex];
+
+    const end =
+      values[safeIndex + 1];
+
+    const segmentProgress =
+      (percent - (safeIndex * segmentSize))
+      / segmentSize;
+
+    const value =
+      start + ((end - start) * segmentProgress);
+
+    return Math.round(value);
   }
 
   return percent;
 }
-
 /* =========================
    ADD TICKS
 ========================= */

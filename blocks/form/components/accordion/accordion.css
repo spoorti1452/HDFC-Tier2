@@ -323,3 +323,643 @@ main .form fieldset.accordion {
   box-shadow: none !important;
   outline: none;
 }
+
+/* =========================
+   LOAN DETAILS ACCORDION
+   ========================= */
+
+.form .field-loan-details {
+  width: 100%;
+  border: 1px solid #e5e9f2;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f7f9fc;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px 28px;
+}
+
+/* HEADER */
+.form .field-loan-details > legend {
+  grid-column: 1 / -1;
+  background: #e4e8f1;
+  padding: 22px 28px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d3748;
+  position: relative;
+}
+
+/* FIELD WRAPPER */
+.form .field-loan-details > .field-wrapper {
+  position: relative;
+  padding-left: 14px;
+  margin-bottom: 12px;
+}
+
+/* LEFT ORANGE BAR */
+.form .field-loan-details > .field-wrapper::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 3px;
+  height: 48px;
+  border-radius: 10px;
+  background: #8eaaff;
+}
+
+/* LABEL */
+.form .field-loan-details label {
+  display: block;
+  margin-bottom: 8px;
+  color: #7d8898;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* INPUT */
+/* VALUE STYLE LIKE REFERENCE */
+
+/* EDITABLE INPUT STYLE */
+
+.form .field-loan-details input,
+.form .field-loan-details select,
+.form .field-loan-details textarea {
+  width: 100%;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  height: auto !important;
+  min-height: auto !important;
+
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #1f2d3d !important;
+
+  cursor: text;
+}
+
+/* REMOVE INPUT BOX UI */
+
+.form .field-loan-details .text-wrapper,
+.form .field-loan-details .number-wrapper {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* READONLY */
+.form .field-loan-details input[readonly] {
+  background: #f9fafc;
+}
+
+/* REMOVE AEM WIDTH ISSUE */
+.form .field-loan-details .col-3,
+.form .field-loan-details .col-12 {
+  width: auto !important;
+  max-width: unset !important;
+  flex: unset !important;
+}
+
+/* =========================
+   PERSONAL DETAILS
+   ========================= */
+
+.form .field-personal-details {
+  width: 100%;
+  border: 1px solid #e5e9f2;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f7f9fc;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 18px 10px;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.form .field-personal-details > legend {
+  grid-column: 1 / -1;
+
+  background: #e4e8f1;
+  padding: 22px 28px;
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d3748;
+
+  position: relative;
+}
+
+/* =========================
+   FIELD WRAPPER
+   ========================= */
+
+.form .field-personal-details > .field-wrapper {
+  position: relative;
+
+  padding-left: 10px;
+  margin: 0 16px 6px;
+
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+/* =========================
+   BLUE LEFT BAR
+   ========================= */
+
+.form .field-personal-details > .field-wrapper::before {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  top: 4px;
+
+  width: 3px;
+  height: 48px;
+
+  border-radius: 10px;
+
+  background: #8eaaff;
+}
+
+/* =========================
+   LABEL
+   ========================= */
+
+.form .field-personal-details label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #7d8898;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================
+   INPUT STYLE
+   ========================= */
+
+.form .field-personal-details input,
+.form .field-personal-details select,
+.form .field-personal-details textarea {
+  width: 100%;
+
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  height: auto !important;
+  min-height: auto !important;
+
+  font-size: 16px !important;
+  font-weight: 700 !important;
+
+  color: #1f2d3d !important;
+
+  cursor: text;
+}
+
+/* REMOVE INPUT BOX UI */
+
+.form .field-personal-details .text-wrapper,
+.form .field-personal-details .number-wrapper,
+.form .field-personal-details .date-wrapper {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* =========================
+   FULL WIDTH FIELDS
+   ========================= */
+
+.form .field-personal-details .field-current-address,
+.form .field-personal-details .field-residence-type {
+  grid-column: 1 / -1;
+}
+
+/* =========================
+   REMOVE AEM WIDTH ISSUE
+   ========================= */
+
+.form .field-personal-details .col-3,
+.form .field-personal-details .col-12 {
+  width: auto !important;
+  max-width: unset !important;
+  flex: unset !important;
+}
+
+/* =========================
+   SALARY ACCOUNT DETAILS
+   ========================= */
+
+.form .field-salary-account-details {
+  width: 100%;
+  border: 1px solid #e5e9f2;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f7f9fc;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 18px 10px;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.form .field-salary-account-details > legend {
+  grid-column: 1 / -1;
+
+  background: #e4e8f1;
+  padding: 22px 28px;
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d3748;
+
+  position: relative;
+}
+
+/* =========================
+   FIELD WRAPPER
+   ========================= */
+
+.form .field-salary-account-details > .field-wrapper {
+  position: relative;
+
+  padding-left: 10px;
+  margin: 0 16px 10px;
+
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+/* =========================
+   BLUE LEFT BAR
+   ========================= */
+
+.form .field-salary-account-details > .field-wrapper::before {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  top: 4px;
+
+  width: 3px;
+  height: 48px;
+
+  border-radius: 10px;
+
+  background: #8eaaff;
+}
+
+/* =========================
+   LABEL
+   ========================= */
+
+.form .field-salary-account-details label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #7d8898;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================
+   INPUT STYLE
+   ========================= */
+
+.form .field-salary-account-details input,
+.form .field-salary-account-details select,
+.form .field-salary-account-details textarea {
+  width: 100%;
+
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  height: auto !important;
+  min-height: auto !important;
+
+  font-size: 16px !important;
+  font-weight: 700 !important;
+
+  color: #1f2d3d !important;
+
+  cursor: text;
+}
+
+/* REMOVE INPUT BOX */
+
+.form .field-salary-account-details .text-wrapper,
+.form .field-salary-account-details .number-wrapper {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* =========================
+   REMOVE AEM WIDTH ISSUE
+   ========================= */
+
+.form .field-salary-account-details .col-4,
+.form .field-salary-account-details .col-12 {
+  width: auto !important;
+  max-width: unset !important;
+  flex: unset !important;
+}
+
+/* =========================
+   OFFICE ADDRESS
+   ========================= */
+
+.form .field-office-address {
+  width: 100%;
+  border: 1px solid #e5e9f2;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f7f9fc;
+
+  display: grid;
+  grid-template-columns: 1fr;
+
+  gap: 18px;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.form .field-office-address > legend {
+  background: #e4e8f1;
+
+  padding: 22px 28px;
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+/* =========================
+   FIELD WRAPPER
+   ========================= */
+
+.form .field-office-address > .field-wrapper {
+  position: relative;
+
+  padding-left: 10px;
+  margin: 0 16px 16px;
+
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* =========================
+   BLUE LEFT BAR
+   ========================= */
+
+.form .field-office-address > .field-wrapper::before {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  top: 4px;
+
+  width: 3px;
+  height: 48px;
+
+  border-radius: 10px;
+
+  background: #8eaaff;
+}
+
+/* =========================
+   LABEL
+   ========================= */
+
+.form .field-office-address label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #7d8898;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================
+   INPUT STYLE
+   ========================= */
+
+.form .field-office-address input,
+.form .field-office-address textarea {
+  width: 100%;
+
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  height: auto !important;
+  min-height: auto !important;
+
+  font-size: 16px !important;
+  font-weight: 700 !important;
+
+  color: #1f2d3d !important;
+
+  cursor: text;
+}
+
+/* REMOVE INPUT BOX */
+
+.form .field-office-address .text-wrapper {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* =========================
+   REMOVE AEM WIDTH ISSUE
+   ========================= */
+
+.form .field-office-address .col-12 {
+  width: auto !important;
+  max-width: unset !important;
+  flex: unset !important;
+}
+
+/* =========================
+   REFERENCE DETAILS
+   ========================= */
+
+.form .field-reference-details {
+  width: 100%;
+  border: 1px solid #e5e9f2;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f7f9fc;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 18px 10px;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.form .field-reference-details > legend {
+  grid-column: 1 / -1;
+
+  background: #e4e8f1;
+
+  padding: 22px 28px;
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+/* =========================
+   FIELD WRAPPER
+   ========================= */
+
+.form .field-reference-details > .field-wrapper {
+  position: relative;
+
+  padding-left: 10px;
+  margin: 0 16px 12px;
+
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* =========================
+   BLUE LEFT BAR
+   ========================= */
+
+.form .field-reference-details > .field-wrapper::before {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  top: 4px;
+
+  width: 3px;
+  height: 48px;
+
+  border-radius: 10px;
+
+  background: #8eaaff;
+}
+
+/* =========================
+   LABEL
+   ========================= */
+
+.form .field-reference-details label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #7d8898;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================
+   INPUT STYLE
+   ========================= */
+
+.form .field-reference-details input,
+.form .field-reference-details textarea {
+  width: 100%;
+
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  height: auto !important;
+  min-height: auto !important;
+
+  font-size: 16px !important;
+  font-weight: 700 !important;
+
+  color: #1f2d3d !important;
+
+  cursor: text;
+}
+
+/* REMOVE INPUT BOX */
+
+.form .field-reference-details .text-wrapper {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* =========================
+   REMOVE AEM WIDTH ISSUE
+   ========================= */
+
+.form .field-reference-details .col-6,
+.form .field-reference-details .col-12 {
+  width: auto !important;
+  max-width: unset !important;
+  flex: unset !important;
+}
+
+/* =========================
+   SPACING BETWEEN ACCORDIONS
+   ========================= */
+
+.form .accordion > fieldset.panel-wrapper {
+  margin-bottom: 24px !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+/* LAST ACCORDION */
+.form .accordion > fieldset.panel-wrapper:last-child {
+  margin-bottom: 0 !important;
+}
