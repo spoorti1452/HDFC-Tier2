@@ -287,18 +287,31 @@ function resendOTP(globals) {
  * VALIDATE OTP
  * @param {scope} globals
  */
+/**
+ * VALIDATE OTP
+ * @param {scope} globals
+ */
 function validateOTP(globals) {
   try {
+
     const data = globals.functions.exportData();
 
-    const mobile = data.aadhaar_linked_mobile_number || "";
-    const dob = data.date_of_birth || "";
-    const pan = data.pan_card || "";
-    const otp = data.otp_Value || "";
+    const mobile =
+      data.aadhaar_linked_mobile_number || "";
+
+    const dob =
+      data.date_of_birth || "";
+
+    const pan =
+      data.pan_card || "";
+
+    const otp =
+      data.otp_Value || "";
 
     let identifierType = "";
     let identifierValue = "";
 
+    // ✅ IDENTIFIER LOGIC
     if (pan) {
       identifierType = "PAN";
       identifierValue = pan;
@@ -307,34 +320,43 @@ function validateOTP(globals) {
       identifierValue = dob;
     }
 
-    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/validateOtp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        requestString: {
-          mobileNo: mobile,
-          identifierType,
-          identifierValue,
-          otpValue: otp
-        }
-      })
-    })
-      .then(res => res.json())
-      .then(response => {
+    // ✅ API CALL
+    fetch(
+      "https://ricotta-overcook-abrasive.ngrok-free.dev/api/validateOtp",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          requestString: {
+            mobileNo: mobile,
+            identifierType,
+            identifierValue,
+            otpValue: otp
+          }
+        })
+      }
+    )
+      .then((res) => res.json())
+      .then((response) => {
+
+        console.log("VALIDATE RESPONSE:", response);
 
         const isValid =
           response?.responseString?.otpValid;
 
+        // ✅ SUCCESS
         if (isValid === "Y") {
 
           stopOtpTimer();
 
-          // ✅ OTP VALID MESSAGE
+          // ✅ OTP SUCCESS MESSAGE
           globals.functions.setProperty(
             globals.form.otp_verification.otpValid,
-            { value: "OTP Verified" }
+            {
+              value: "OTP Verified"
+            }
           );
 
           // ✅ GET CUSTOMER DETAILS
@@ -347,39 +369,66 @@ function validateOTP(globals) {
           const address =
             customer.address || "";
 
-          // ✅ SET FULL NAME
-// ✅ SET FULL NAME
-globals.functions.setProperty(
-  globals.form.details.customer_details.full_name,
-  { value: fullName }
-);
+          console.log("FULL NAME:", fullName);
+          console.log("ADDRESS:", address);
 
-// ✅ SET ADDRESS
-globals.functions.setProperty(
-  globals.form.details.customer_details.address_details.address_as_per_aadhaar_records,
-  { value: address }
-);
-
-          // ✅ SHOW DETAILS PANEL
+          // ✅ SHOW DETAILS PANEL FIRST
           globals.functions.setProperty(
             globals.form.details,
-            { visible: true }
+            {
+              visible: true
+            }
           );
 
-        } else {
+          // ✅ WAIT FOR PANEL TO RENDER
+          setTimeout(() => {
+
+            try {
+
+              // ✅ FULL NAME FIELD
+              globals.functions.setProperty(
+                globals.form.details.customer_details.full_name_as_per_aadhaar,
+                {
+                  value: fullName
+                }
+              );
+
+              // ✅ ADDRESS FIELD
+              globals.functions.setProperty(
+                globals.form.details.address_details.address_as_per_aadhaar_records,
+                {
+                  value: address
+                }
+              );
+
+            } catch (err) {
+              console.log("FIELD SET ERROR:", err);
+            }
+
+          }, 1000);
+
+        }
+
+        // ❌ INVALID OTP
+        else {
 
           globals.functions.setProperty(
             globals.form.otp_verification.otpValid,
-            { value: "Invalid OTP" }
+            {
+              value: "Invalid OTP"
+            }
           );
         }
+
+      })
+      .catch((err) => {
+        console.log("API ERROR:", err);
       });
 
   } catch (e) {
     console.log("VALIDATE ERROR:", e);
   }
 }
-
 /**
  * SEND EMAIL OTP FUNCTION (AEM EDS COMPATIBLE)
  * @param {scope} globals
