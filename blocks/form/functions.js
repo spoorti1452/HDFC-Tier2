@@ -348,16 +348,17 @@ function validateOTP(globals) {
             customer.address || "";
 
           // ✅ SET FULL NAME
-          globals.functions.setProperty(
-            globals.form.details.customer_details.full_name,
-            { value: fullName }
-          );
+// ✅ SET FULL NAME
+globals.functions.setProperty(
+  globals.form.details.customer_details.full_name,
+  { value: fullName }
+);
 
-          // ✅ SET ADDRESS
-          globals.functions.setProperty(
-            globals.form.details.customer_details.address_details.address_as_per_aadhaar_records,
-            { value: address }
-          );
+// ✅ SET ADDRESS
+globals.functions.setProperty(
+  globals.form.details.customer_details.address_details.address_as_per_aadhaar_records,
+  { value: address }
+);
 
           // ✅ SHOW DETAILS PANEL
           globals.functions.setProperty(
