@@ -1,39 +1,78 @@
-const AMOUNT_VALUES = [50000, 200000, 400000, 600000, 800000, 1000000, 1500000];
-const TENURE_VALUES = [12, 24, 36, 48, 60, 72, 84];
+const AMOUNT_VALUES = [
+  50000,
+  200000,
+  400000,
+  600000,
+  800000,
+  1000000,
+  1500000
+];
+
+const TENURE_VALUES = [
+  12,
+  24,
+  36,
+  48,
+  60,
+  72,
+  84
+];
 
 /* =========================
    FORMAT VALUE
 ========================= */
-function formatValue(input, percent) {
-  const name = input.name;
+function formatValue(input, actualValue) {
 
-  if (name === "loanAmount") {
-    const index = Math.round((percent / 100) * (AMOUNT_VALUES.length - 1));
-    return `₹${AMOUNT_VALUES[index].toLocaleString("en-IN")}`;
+  // ✅ LOAN AMOUNT
+  if (input.name === "loanAmount") {
+
+    return `₹${Number(actualValue)
+      .toLocaleString("en-IN")}`;
   }
 
-  if (name === "loanTenure") {
-    const index = Math.round((percent / 100) * (TENURE_VALUES.length - 1));
-    return `${TENURE_VALUES[index]} months`;
+  // ✅ TENURE
+  if (input.name === "loanTenure") {
+
+    return `${actualValue} months`;
   }
 
-  return percent;
+  return actualValue;
 }
 
 /* =========================
-   GET ACTUAL VALUE
+   GET INTERPOLATED VALUE
+   (MIDDLE VALUES SUPPORT)
 ========================= */
 function getActualValue(input, percent) {
-  const name = input.name;
 
-  if (name === "loanAmount") {
-    const index = Math.round((percent / 100) * (AMOUNT_VALUES.length - 1));
-    return AMOUNT_VALUES[index];
+  /* =========================
+     LOAN AMOUNT
+  ========================= */
+  if (input.name === "loanAmount") {
+
+    const min = 50000;
+    const max = 1500000;
+
+    // ✅ SMOOTH VALUES
+    const value =
+      min + ((max - min) * percent / 100);
+
+    // ✅ ROUND TO NEAREST 10K
+    return Math.round(value / 10000) * 10000;
   }
 
-  if (name === "loanTenure") {
-    const index = Math.round((percent / 100) * (TENURE_VALUES.length - 1));
-    return TENURE_VALUES[index];
+  /* =========================
+     TENURE
+  ========================= */
+  if (input.name === "loanTenure") {
+
+    const min = 12;
+    const max = 84;
+
+    // ✅ ROUND TO WHOLE MONTH
+    return Math.round(
+      min + ((max - min) * percent / 100)
+    );
   }
 
   return percent;
@@ -43,92 +82,171 @@ function getActualValue(input, percent) {
    ADD TICKS
 ========================= */
 function addTicks(wrapper, input) {
+
   const values =
-    input.name === "loanAmount" ? AMOUNT_VALUES : TENURE_VALUES;
+    input.name === "loanAmount"
+      ? AMOUNT_VALUES
+      : TENURE_VALUES;
 
   values.forEach((val, i) => {
-    const tick = document.createElement("span");
-    tick.className = "custom-range-tick";
 
-    const label = document.createElement("span");
+    const tick =
+      document.createElement("span");
 
-    // label text
+    tick.className =
+      "custom-range-tick";
+
+    const label =
+      document.createElement("span");
+
+    /* =========================
+       LABELS
+    ========================= */
     if (input.name === "loanAmount") {
+
       label.textContent =
-        val >= 100000 ? val / 100000 + "L" : val / 1000 + "K";
+        val >= 100000
+          ? (val / 100000) + "L"
+          : (val / 1000) + "K";
+
     } else {
-      label.textContent = val + "m";
+
+      label.textContent =
+        val + "m";
     }
 
-    // ✅ POSITION (IMPORTANT)
-    tick.style.left = `${(i / (values.length - 1)) * 100}%`;
+    // ✅ POSITION
+    tick.style.left =
+      `${(i / (values.length - 1)) * 100}%`;
 
-    // click support
+    /* =========================
+       CLICK SUPPORT
+    ========================= */
     label.onclick = () => {
-      const percent = (i / (values.length - 1)) * 100;
+
+      const percent =
+        (i / (values.length - 1)) * 100;
+
       input.value = percent;
-      input.dispatchEvent(new Event("input", { bubbles: true }));
+
+      input.dispatchEvent(
+        new Event("input", {
+          bubbles: true
+        })
+      );
     };
 
     tick.appendChild(label);
+
     wrapper.appendChild(tick);
   });
 }
+
 /* =========================
    UPDATE UI + VALUE
 ========================= */
 function updateBubble(input, wrapper) {
-  const percent = Number(input.value);
-  const bubble = wrapper.querySelector(".range-bubble");
 
-  const actual = getActualValue(input, percent);
+  const percent =
+    Number(input.value);
 
-  // ✅ store real value (IMPORTANT)
-  input.dataset.actualValue = actual;
+  const bubble =
+    wrapper.querySelector(".range-bubble");
 
-  // UI
-  bubble.innerText = formatValue(input, percent);
+  // ✅ GET SMOOTH VALUE
+  const actual =
+    getActualValue(input, percent);
+
+  // ✅ STORE REAL VALUE
+  input.dataset.actualValue =
+    actual;
+
+  // ✅ UPDATE UI
+  bubble.innerText =
+    formatValue(input, actual);
 
   const totalSteps = 100;
   const currentSteps = percent;
 
-  wrapper.style.setProperty("--total-steps", totalSteps);
-  wrapper.style.setProperty("--current-steps", currentSteps);
+  wrapper.style.setProperty(
+    "--total-steps",
+    totalSteps
+  );
 
-  bubble.style.left = `calc(${percent}% - 15px)`;
+  wrapper.style.setProperty(
+    "--current-steps",
+    currentSteps
+  );
+
+  // ✅ BUBBLE POSITION
+  bubble.style.left =
+    `calc(${percent}% - 15px)`;
 }
 
 /* =========================
    DECORATE
 ========================= */
 export default function decorate(fieldDiv) {
-  const input = fieldDiv.querySelector("input");
+
+  const input =
+    fieldDiv.querySelector("input");
+
   if (!input) return fieldDiv;
 
-  // ✅ USE PERCENT BASED SLIDER
+  /* =========================
+     RANGE SETUP
+  ========================= */
   input.type = "range";
+
   input.min = 0;
   input.max = 100;
+
+  // ✅ SMOOTH MOVEMENT
   input.step = 1;
+
+  // ✅ INITIAL POSITION
   input.value = 50;
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "range-widget-wrapper decorated";
+  /* =========================
+     WRAPPER
+  ========================= */
+  const wrapper =
+    document.createElement("div");
 
-  const bubble = document.createElement("span");
-  bubble.className = "range-bubble";
+  wrapper.className =
+    "range-widget-wrapper decorated";
+
+  const bubble =
+    document.createElement("span");
+
+  bubble.className =
+    "range-bubble";
 
   input.after(wrapper);
+
   wrapper.appendChild(bubble);
+
   wrapper.appendChild(input);
 
+  /* =========================
+     TICKS
+  ========================= */
   addTicks(wrapper, input);
 
-  input.addEventListener("input", () => {
-    updateBubble(input, wrapper);
-  });
+  /* =========================
+     INPUT EVENT
+  ========================= */
+  input.addEventListener(
+    "input",
+    () => {
 
-  // INIT
+      updateBubble(input, wrapper);
+    }
+  );
+
+  /* =========================
+     INITIAL RENDER
+  ========================= */
   updateBubble(input, wrapper);
 
   return fieldDiv;
