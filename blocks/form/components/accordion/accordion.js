@@ -84,7 +84,7 @@ function addVerifyButton(panel) {
 
 /* ===== OTP FIELD ===== */
 function showOtpField(emailField, input) {
-  if (emailField.querySelector('.otp-container')) return;
+  if (emailField.parentElement.querySelector('.otp-container')) return;
 
   const container = document.createElement('div');
   container.className = 'otp-container';
@@ -97,18 +97,25 @@ function showOtpField(emailField, input) {
   otpInput.setAttribute('autocomplete', 'one-time-code');
   otpInput.setAttribute('inputmode', 'numeric');
   otpInput.setAttribute('maxlength', '6');
-  otpInput.name = 'otp_input_unique'; // prevent AEM overwrite
+
+  // IMPORTANT
+  otpInput.setAttribute('data-ignore', 'true');
+  otpInput.setAttribute('autocomplete', 'off');
+
+  // REMOVE name attribute completely
+  // otpInput.name = 'otp_input_unique';
 
   const verifyBtn = document.createElement('button');
   verifyBtn.textContent = 'Submit OTP';
   verifyBtn.className = 'otp-submit-btn';
+  verifyBtn.type = 'button';
 
   container.appendChild(otpInput);
   container.appendChild(verifyBtn);
 
-  emailField.appendChild(container);
+  // APPEND OUTSIDE EMAIL FIELD
+  emailField.parentElement.appendChild(container);
 
-  /* ===== VERIFY OTP ===== */
   verifyBtn.addEventListener('click', async () => {
     const otp = otpInput.value.trim();
 
@@ -116,11 +123,6 @@ function showOtpField(emailField, input) {
 
     if (!otp) {
       alert('Please enter OTP');
-      return;
-    }
-
-    if (!email || !email.includes('@')) {
-      alert('Email invalid. Please verify again.');
       return;
     }
 
@@ -143,11 +145,10 @@ function showOtpField(emailField, input) {
 
       if (data?.responseString?.otpValid === "Y") {
 
-        window.emailVerified = true;
-
         alert('Email Verified');
 
         const mainBtn = emailField.querySelector('.email-verify-btn');
+
         if (mainBtn) {
           mainBtn.textContent = 'Verified';
           mainBtn.style.color = 'green';
@@ -156,9 +157,6 @@ function showOtpField(emailField, input) {
 
         otpInput.disabled = true;
         verifyBtn.disabled = true;
-
-        // OPTIONAL: remove OTP field
-        // container.remove();
 
       } else {
         alert('Invalid OTP');
