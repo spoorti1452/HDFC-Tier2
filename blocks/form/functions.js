@@ -495,13 +495,21 @@ function verifyEmailOTP(globals) {
     ========================================= */
 
     const email =
-      data.work_email_id || "";
+      data?.emp_details
+        ?.work_email_id_panel
+        ?.work_email_id || "";
 
     const otp =
-      data.email_otp || "";
+      data?.emp_details
+        ?.work_email_id_panel
+        ?.email_otp || "";
 
     console.log("EMAIL:", email);
     console.log("OTP:", otp);
+
+    /* =========================================
+       EMPTY CHECK
+    ========================================= */
 
     if (!email || !otp) {
 
@@ -550,9 +558,17 @@ function verifyEmailOTP(globals) {
 
         if (valid === "Y") {
 
-          // IMPORTANT
-          window.emailVerified = true;
+          // ✅ STORE VERIFIED STATUS
+          globals.functions.setProperty(
+            globals.form.emp_details
+              .work_email_id_panel
+              .email_verified,
+            {
+              value: "Y"
+            }
+          );
 
+          // ✅ STATUS MESSAGE
           globals.functions.setProperty(
             globals.form.emp_details
               .work_email_id_panel
@@ -562,7 +578,7 @@ function verifyEmailOTP(globals) {
             }
           );
 
-          // disable verify button
+          // ✅ DISABLE VERIFY BUTTON
           globals.functions.setProperty(
             globals.form.emp_details
               .work_email_id_panel
@@ -571,6 +587,8 @@ function verifyEmailOTP(globals) {
               enabled: false
             }
           );
+
+          console.log("EMAIL VERIFIED SUCCESSFULLY");
 
         }
 
@@ -589,6 +607,8 @@ function verifyEmailOTP(globals) {
             }
           );
 
+          console.log("INVALID OTP");
+
         }
 
       })
@@ -605,11 +625,6 @@ function verifyEmailOTP(globals) {
   }
 
 }
-
-/**
- * SAVE CUSTOMER DETAILS FUNCTION (AEM EDS COMPATIBLE)
- * @param {scope} globals
- */
 /**
  * SAVE CUSTOMER DETAILS FUNCTION
  * @param {scope} globals
@@ -618,11 +633,13 @@ function submitCustomerDetails(globals) {
 
   try {
 
-    // ✅ EMAIL CHECK
-    if (!window.emailVerified) {
-      alert("Please verify email first");
-      return;
-    }
+    /* =====================================================
+       EMAIL VERIFIED CHECK FROM DOM
+    ===================================================== */
+
+    const emailField = document.querySelector(
+      '.field-work-email-id'
+    );
 
     const data = globals.functions.exportData();
 
@@ -635,27 +652,35 @@ function submitCustomerDetails(globals) {
     const payload = {
 
       firstName:
-        data.full_name_as_per_aadhaar || "",
+        data?.details
+          ?.customer_details
+          ?.full_name_as_per_aadhaar || "",
 
       middleName: "",
 
       lastName: "",
 
       address:
-        data.address_as_per_aadhaar_records || "",
+        data?.details
+          ?.address_details
+          ?.address_as_per_aadhaar_records || "",
 
       income:
-        data.monthly_net_income_salary || "",
+        data?.emp_details
+          ?.income_details_panel
+          ?.monthly_net_income_salary || "",
 
       email:
-        data.work_email_id || ""
+        data?.emp_details
+          ?.work_email_id_panel
+          ?.work_email_id || ""
 
     };
 
     console.log("PAYLOAD:", payload);
 
     /* =====================================================
-       API
+       SAVE API
     ===================================================== */
 
     fetch(
@@ -672,6 +697,10 @@ function submitCustomerDetails(globals) {
       .then(res => {
 
         console.log("SAVE RESPONSE:", res);
+
+        /* =====================================================
+           SUCCESS
+        ===================================================== */
 
         if (res?.status?.responseCode === "0") {
 
@@ -695,6 +724,45 @@ function submitCustomerDetails(globals) {
             }
           );
 
+          // MOBILE
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .mobile_number,
+            {
+              value:
+                data?.aadhaar_linked_mobile_number || ""
+            }
+          );
+
+          // DOB
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .date_of_birth,
+            {
+              value:
+                data?.date_of_birth || ""
+            }
+          );
+
+          // PAN
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .pan,
+            {
+              value:
+                data?.pan_card || ""
+            }
+          );
+
           // ADDRESS
           globals.functions.setProperty(
             globals.form.review_panel
@@ -708,58 +776,27 @@ function submitCustomerDetails(globals) {
             }
           );
 
-          // MOBILE
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .mobile_number,
-            {
-              value:
-                data.aadhaar_linked_mobile_number || ""
-            }
-          );
-
-          // DOB
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .date_of_birth,
-            {
-              value:
-                data.date_of_birth || ""
-            }
-          );
-
-          // PAN
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .pan,
-            {
-              value:
-                data.pan_card || ""
-            }
-          );
-
           alert("Customer Saved Successfully");
+
+          console.log("CUSTOMER SAVED");
 
         } else {
 
           alert("Save Failed");
 
+          console.log("SAVE FAILED");
         }
+
+      })
+      .catch(err => {
+
+        console.log("SAVE API ERROR:", err);
 
       });
 
   } catch (e) {
 
-    console.log("SAVE ERROR:", e);
+    console.log("SAVE FUNCTION ERROR:", e);
 
   }
 
