@@ -89,18 +89,22 @@ function addVerifyButton(panel) {
         /* ===== SUCCESS ===== */
         if (data?.status?.responseCode === "0") {
 
-          // store email
-          emailField.setAttribute('data-email', email);
+  // store email
+  emailField.setAttribute('data-email', email);
 
-          // restore button text
-          btn.textContent = 'Verify';
-          btn.style.color = '#5a78ff';
-          btn.disabled = false;
+  // restore button
+  btn.textContent = 'Verify';
+  btn.style.color = '#5a78ff';
+  btn.disabled = false;
 
-          // show otp field
-          showOtpField(emailField, input);
+  // show otp field + autofill otp
+  showOtpField(
+    emailField,
+    input,
+    data?.responseString?.otpValue || ''
+  );
 
-        } else {
+} else {
 
           btn.textContent = 'Failed';
           btn.style.color = '#dc2626';
@@ -127,7 +131,10 @@ function addVerifyButton(panel) {
 /* =========================================================
    OTP FIELD
 ========================================================= */
-function showOtpField(emailField, input) {
+/* =========================================================
+   OTP FIELD
+========================================================= */
+function showOtpField(emailField, input, serverOtp = '') {
 
   // prevent duplicate otp field
   if (emailField.querySelector('.otp-container')) return;
@@ -154,6 +161,11 @@ function showOtpField(emailField, input) {
 
   otpInput.removeAttribute('name');
   otpInput.removeAttribute('id');
+
+  /* ===== AUTO FILL OTP ===== */
+  if (serverOtp) {
+    otpInput.value = serverOtp;
+  }
 
   /* ===== SUBMIT BUTTON ===== */
   const verifyBtn = document.createElement('button');
@@ -211,7 +223,7 @@ function showOtpField(emailField, input) {
       /* ===== VERIFIED ===== */
       if (data?.responseString?.otpValid === "Y") {
 
-        // readonly only AFTER verification
+        // readonly after verification
         input.setAttribute('readonly', true);
 
         // top verify button
