@@ -665,12 +665,6 @@ function submitCustomerDetails(globals) {
     const address =
       data.address_as_per_aadhaar_records || "";
 
-    const income =
-      data.monthly_net_income_salary || "";
-
-    const email =
-      data.work_email_id || "";
-
     const mobile =
       data.aadhaar_linked_mobile_number || "";
 
@@ -682,147 +676,78 @@ function submitCustomerDetails(globals) {
 
     console.log("FULL NAME:", fullName);
     console.log("ADDRESS:", address);
-    console.log("INCOME:", income);
-    console.log("EMAIL:", email);
 
     /* =====================================================
-       PAYLOAD
+       REVIEW PANEL MAPPING
     ===================================================== */
 
-    const payload = {
-
-      firstName: fullName,
-
-      middleName: "",
-
-      lastName: "",
-
-      address: address,
-
-      income: income,
-
-      email: email
-
-    };
-
-    console.log("PAYLOAD:", payload);
-
-    /* =====================================================
-       API
-    ===================================================== */
-
-    fetch(
-      "https://ricotta-overcook-abrasive.ngrok-free.dev/api/saveCustomerDetails",
+    // FULL NAME
+    globals.functions.setProperty(
+      globals.form.review_panel
+        .review_fragment
+        .trier2_fragment
+        .personal_accordion
+        .full_name,
       {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(payload)
+        value: fullName
       }
-    )
-      .then(res => res.json())
-      .then(res => {
+    );
 
-        console.log("SAVE RESPONSE:", res);
+    // CURRENT ADDRESS
+    globals.functions.setProperty(
+      globals.form.review_panel
+        .review_fragment
+        .trier2_fragment
+        .personal_accordion
+        .current_address,
+      {
+        value: address
+      }
+    );
 
-        /* =====================================================
-           SUCCESS
-        ===================================================== */
+    // MOBILE NUMBER
+    globals.functions.setProperty(
+      globals.form.review_panel
+        .review_fragment
+        .trier2_fragment
+        .personal_accordion
+        .mobile_number,
+      {
+        value: mobile
+      }
+    );
 
-        if (res?.status?.responseCode === "0") {
+    // DATE OF BIRTH
+    globals.functions.setProperty(
+      globals.form.review_panel
+        .review_fragment
+        .trier2_fragment
+        .personal_accordion
+        .date_of_birth,
+      {
+        value: dob
+      }
+    );
 
-          const customer =
-            res?.responseString?.customer || {};
+    // PAN
+    globals.functions.setProperty(
+      globals.form.review_panel
+        .review_fragment
+        .trier2_fragment
+        .personal_accordion
+        .pan,
+      {
+        value: pan
+      }
+    );
 
-          /* =====================================================
-             REVIEW PANEL
-          ===================================================== */
+    alert("Details Added Successfully");
 
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .full_name,
-            {
-              value: customer.firstName || ""
-            }
-          );
-
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .current_address,
-            {
-              value: customer.address || ""
-            }
-          );
-
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .mobile_number,
-            {
-              value: mobile
-            }
-          );
-
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .date_of_birth,
-            {
-              value: dob
-            }
-          );
-
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .pan,
-            {
-              value: pan
-            }
-          );
-
-          alert("Customer Saved Successfully");
-
-          console.log("CUSTOMER SAVED SUCCESSFULLY");
-
-        }
-
-        /* =====================================================
-           FAILED
-        ===================================================== */
-
-        else {
-
-          console.log("SAVE FAILED");
-
-          alert("Save Failed");
-        }
-
-      })
-      .catch(err => {
-
-        console.log("SAVE API ERROR:", err);
-
-      });
+    console.log("REVIEW PANEL UPDATED");
 
   } catch (e) {
 
-    console.log("SAVE FUNCTION ERROR:", e);
+    console.log("SUBMIT ERROR:", e);
 
   }
 
