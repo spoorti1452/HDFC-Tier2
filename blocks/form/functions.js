@@ -508,19 +508,22 @@ function verifyEmailOTP(globals) {
       .then(res => {
         const valid = res?.responseString?.otpValid;
 
-        if (valid === "Y") {
-          globals.functions.setProperty(
-            globals.form.emp_details.work_email_id_panel.email_otp_status,
-            { value: "Email Verified " }
-          );
+ if (valid === "Y") {
 
-          // 🔥 disable verify button
-          globals.functions.setProperty(
-            globals.form.emp_details.work_email_id_panel.verify_btn,
-            { enabled: false }
-          );
+  // IMPORTANT
+  window.emailVerified = true;
 
-        } else {
+  globals.functions.setProperty(
+    globals.form.emp_details.work_email_id_panel.email_otp_status,
+    { value: "Email Verified" }
+  );
+
+  globals.functions.setProperty(
+    globals.form.emp_details.work_email_id_panel.verify_btn,
+    { enabled: false }
+  );
+
+} else {
           globals.functions.setProperty(
             globals.form.emp_details.work_email_id_panel.email_otp_status,
             { value: "Invalid OTP " }
@@ -537,10 +540,15 @@ function verifyEmailOTP(globals) {
  * SAVE CUSTOMER DETAILS FUNCTION (AEM EDS COMPATIBLE)
  * @param {scope} globals
  */
+/**
+ * SAVE CUSTOMER DETAILS FUNCTION
+ * @param {scope} globals
+ */
 function submitCustomerDetails(globals) {
+
   try {
 
-    // ✅ ADD HERE (VERY IMPORTANT)
+    // ✅ EMAIL CHECK
     if (!window.emailVerified) {
       alert("Please verify email first");
       return;
@@ -548,34 +556,143 @@ function submitCustomerDetails(globals) {
 
     const data = globals.functions.exportData();
 
+    console.log("FORM DATA:", data);
+
+    /* =====================================================
+       PAYLOAD
+    ===================================================== */
+
     const payload = {
-      firstName: data.pan_first_name || "",
-      middleName: data.pan_middle_name || "",
-      lastName: data.pan_last_name || "",
-      address: data.address_as_per_aadhaar_records || "",
-      income: data.monthly_net_income_salary || "",
-      email: data.work_email_id || ""
+
+      firstName:
+        data.full_name_as_per_aadhaar || "",
+
+      middleName: "",
+
+      lastName: "",
+
+      address:
+        data.address_as_per_aadhaar_records || "",
+
+      income:
+        data.monthly_net_income_salary || "",
+
+      email:
+        data.work_email_id || ""
+
     };
 
-    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/saveCustomerDetails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    })
+    console.log("PAYLOAD:", payload);
+
+    /* =====================================================
+       API
+    ===================================================== */
+
+    fetch(
+      "https://ricotta-overcook-abrasive.ngrok-free.dev/api/saveCustomerDetails",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    )
       .then(res => res.json())
       .then(res => {
+
+        console.log("SAVE RESPONSE:", res);
+
         if (res?.status?.responseCode === "0") {
-          alert("Customer Saved Successfully ");
+
+          const customer =
+            res?.responseString?.customer || {};
+
+          /* =====================================================
+             REVIEW PANEL
+          ===================================================== */
+
+          // FULL NAME
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .full_name,
+            {
+              value:
+                customer.firstName || ""
+            }
+          );
+
+          // ADDRESS
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .current_address,
+            {
+              value:
+                customer.address || ""
+            }
+          );
+
+          // MOBILE
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .mobile_number,
+            {
+              value:
+                data.aadhaar_linked_mobile_number || ""
+            }
+          );
+
+          // DOB
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .date_of_birth,
+            {
+              value:
+                data.date_of_birth || ""
+            }
+          );
+
+          // PAN
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .pan,
+            {
+              value:
+                data.pan_card || ""
+            }
+          );
+
+          alert("Customer Saved Successfully");
+
         } else {
-          alert("Save Failed ");
+
+          alert("Save Failed");
+
         }
+
       });
 
   } catch (e) {
+
     console.log("SAVE ERROR:", e);
+
   }
+
 }
 /**
  * EMI CALCULATION FUNCTION (AEM EDS COMPATIBLE)
