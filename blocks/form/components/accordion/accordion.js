@@ -62,8 +62,6 @@ function addVerifyButton(panel) {
 
         if (data?.status?.responseCode === "0") {
 
-          alert(`OTP sent: ${data.responseString.otpValue}`);
-
           emailField.setAttribute('data-email', email);
 
           input.setAttribute('readonly', true);
@@ -82,7 +80,6 @@ function addVerifyButton(panel) {
   });
 }
 
-/* ===== OTP FIELD ===== */
 /* ===== OTP FIELD ===== */
 function showOtpField(emailField, input) {
 
@@ -133,12 +130,18 @@ function showOtpField(emailField, input) {
 
     const email = emailField.getAttribute('data-email');
 
+    // no alert
     if (!otp) {
-      alert('Please enter OTP');
+      verifyBtn.textContent = 'Enter OTP';
+      verifyBtn.style.background = '#dc2626';
       return;
     }
 
     try {
+
+      // disable button while verifying
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Verifying...';
 
       const res = await fetch(
         'https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp',
@@ -156,10 +159,10 @@ function showOtpField(emailField, input) {
 
       const data = await res.json();
 
+      /* ===== SUCCESS ===== */
       if (data?.responseString?.otpValid === "Y") {
 
-        alert('Email Verified');
-
+        // top verify button
         const mainBtn = emailField.querySelector('.email-verify-btn');
 
         if (mainBtn) {
@@ -168,17 +171,29 @@ function showOtpField(emailField, input) {
           mainBtn.disabled = true;
         }
 
+        // disable otp field
         otpInput.disabled = true;
-        verifyBtn.disabled = true;
+
+        // success state
+        verifyBtn.textContent = 'Verified';
+        verifyBtn.style.background = '#16a34a';
 
       } else {
-        alert('Invalid OTP');
+
+        // invalid otp
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = 'Invalid OTP';
+        verifyBtn.style.background = '#dc2626';
+
       }
 
     } catch (e) {
 
       console.error(e);
-      alert('Verify API Error');
+
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Error';
+      verifyBtn.style.background = '#dc2626';
 
     }
 
