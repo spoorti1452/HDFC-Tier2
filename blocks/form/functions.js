@@ -634,17 +634,56 @@ function submitCustomerDetails(globals) {
 
   try {
 
-    /* =====================================================
-       EMAIL VERIFIED CHECK FROM DOM
-    ===================================================== */
-
-    const emailField = document.querySelector(
-      '.field-work-email-id'
-    );
-
     const data = globals.functions.exportData();
 
     console.log("FORM DATA:", data);
+
+    /* =====================================================
+       EMAIL VERIFIED CHECK
+    ===================================================== */
+
+    const emailField =
+      document.querySelector('.field-work-email-id');
+
+    const isVerified =
+      emailField?.getAttribute('data-email-verified');
+
+    if (isVerified !== 'Y') {
+
+      alert("Please verify email first");
+
+      return;
+    }
+
+    /* =====================================================
+       GET VALUES
+    ===================================================== */
+
+    const fullName =
+      data.full_name_as_per_aadhaar || "";
+
+    const address =
+      data.address_as_per_aadhaar_records || "";
+
+    const income =
+      data.monthly_net_income_salary || "";
+
+    const email =
+      data.work_email_id || "";
+
+    const mobile =
+      data.aadhaar_linked_mobile_number || "";
+
+    const dob =
+      data.date_of_birth || "";
+
+    const pan =
+      data.pan_card || "";
+
+    console.log("FULL NAME:", fullName);
+    console.log("ADDRESS:", address);
+    console.log("INCOME:", income);
+    console.log("EMAIL:", email);
 
     /* =====================================================
        PAYLOAD
@@ -652,45 +691,35 @@ function submitCustomerDetails(globals) {
 
     const payload = {
 
-      firstName:
-        data?.details
-          ?.customer_details
-          ?.full_name_as_per_aadhaar || "",
+      firstName: fullName,
 
       middleName: "",
 
       lastName: "",
 
-      address:
-        data?.details
-          ?.address_details
-          ?.address_as_per_aadhaar_records || "",
+      address: address,
 
-      income:
-        data?.emp_details
-          ?.income_details_panel
-          ?.monthly_net_income_salary || "",
+      income: income,
 
-      email:
-        data?.emp_details
-          ?.work_email_id_panel
-          ?.work_email_id || ""
+      email: email
 
     };
 
     console.log("PAYLOAD:", payload);
 
     /* =====================================================
-       SAVE API
+       API
     ===================================================== */
 
     fetch(
       "https://ricotta-overcook-abrasive.ngrok-free.dev/api/saveCustomerDetails",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify(payload)
       }
     )
@@ -712,7 +741,6 @@ function submitCustomerDetails(globals) {
              REVIEW PANEL
           ===================================================== */
 
-          // FULL NAME
           globals.functions.setProperty(
             globals.form.review_panel
               .review_fragment
@@ -720,51 +748,10 @@ function submitCustomerDetails(globals) {
               .personal_accordion
               .full_name,
             {
-              value:
-                customer.firstName || ""
+              value: customer.firstName || ""
             }
           );
 
-          // MOBILE
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .mobile_number,
-            {
-              value:
-                data?.aadhaar_linked_mobile_number || ""
-            }
-          );
-
-          // DOB
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .date_of_birth,
-            {
-              value:
-                data?.date_of_birth || ""
-            }
-          );
-
-          // PAN
-          globals.functions.setProperty(
-            globals.form.review_panel
-              .review_fragment
-              .trier2_fragment
-              .personal_accordion
-              .pan,
-            {
-              value:
-                data?.pan_card || ""
-            }
-          );
-
-          // ADDRESS
           globals.functions.setProperty(
             globals.form.review_panel
               .review_fragment
@@ -772,20 +759,58 @@ function submitCustomerDetails(globals) {
               .personal_accordion
               .current_address,
             {
-              value:
-                customer.address || ""
+              value: customer.address || ""
+            }
+          );
+
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .mobile_number,
+            {
+              value: mobile
+            }
+          );
+
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .date_of_birth,
+            {
+              value: dob
+            }
+          );
+
+          globals.functions.setProperty(
+            globals.form.review_panel
+              .review_fragment
+              .trier2_fragment
+              .personal_accordion
+              .pan,
+            {
+              value: pan
             }
           );
 
           alert("Customer Saved Successfully");
 
-          console.log("CUSTOMER SAVED");
+          console.log("CUSTOMER SAVED SUCCESSFULLY");
 
-        } else {
+        }
 
-          alert("Save Failed");
+        /* =====================================================
+           FAILED
+        ===================================================== */
+
+        else {
 
           console.log("SAVE FAILED");
+
+          alert("Save Failed");
         }
 
       })
