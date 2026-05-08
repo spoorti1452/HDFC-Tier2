@@ -479,61 +479,131 @@ function sendEmailOTP(globals) {
 }
 
 /**
- * VERIFY EMAIL OTP FUNCTION (AEM EDS COMPATIBLE)
+ * VERIFY EMAIL OTP FUNCTION
  * @param {scope} globals
  */
 function verifyEmailOTP(globals) {
+
   try {
+
     const data = globals.functions.exportData();
 
-    const email = data.work_email_id || "";
-    const otp = data.email_otp || "";
+    console.log("EXPORT DATA:", data);
+
+    /* =========================================
+       FIELD VALUES
+    ========================================= */
+
+    const email =
+      data.work_email_id || "";
+
+    const otp =
+      data.email_otp || "";
+
+    console.log("EMAIL:", email);
+    console.log("OTP:", otp);
 
     if (!email || !otp) {
-      alert("Enter OTP");
+
+      globals.functions.setProperty(
+        globals.form.emp_details
+          .work_email_id_panel
+          .email_otp_status,
+        {
+          value: "Enter OTP"
+        }
+      );
+
       return;
     }
 
-    fetch("https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email,
-        otpValue: otp
-      })
-    })
+    /* =========================================
+       API CALL
+    ========================================= */
+
+    fetch(
+      "https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          requestString: {
+            email,
+            otpValue: otp
+          }
+        })
+      }
+    )
       .then(res => res.json())
       .then(res => {
-        const valid = res?.responseString?.otpValid;
 
- if (valid === "Y") {
+        console.log("VERIFY RESPONSE:", res);
 
-  // IMPORTANT
-  window.emailVerified = true;
+        const valid =
+          res?.responseString?.otpValid;
 
-  globals.functions.setProperty(
-    globals.form.emp_details.work_email_id_panel.email_otp_status,
-    { value: "Email Verified" }
-  );
+        /* =========================================
+           SUCCESS
+        ========================================= */
 
-  globals.functions.setProperty(
-    globals.form.emp_details.work_email_id_panel.verify_btn,
-    { enabled: false }
-  );
+        if (valid === "Y") {
 
-} else {
+          // IMPORTANT
+          window.emailVerified = true;
+
           globals.functions.setProperty(
-            globals.form.emp_details.work_email_id_panel.email_otp_status,
-            { value: "Invalid OTP " }
+            globals.form.emp_details
+              .work_email_id_panel
+              .email_otp_status,
+            {
+              value: "Verified"
+            }
           );
+
+          // disable verify button
+          globals.functions.setProperty(
+            globals.form.emp_details
+              .work_email_id_panel
+              .verify_btn,
+            {
+              enabled: false
+            }
+          );
+
         }
+
+        /* =========================================
+           INVALID OTP
+        ========================================= */
+
+        else {
+
+          globals.functions.setProperty(
+            globals.form.emp_details
+              .work_email_id_panel
+              .email_otp_status,
+            {
+              value: "Invalid OTP"
+            }
+          );
+
+        }
+
+      })
+      .catch((err) => {
+
+        console.log("VERIFY ERROR:", err);
+
       });
 
   } catch (e) {
+
     console.log("VERIFY EMAIL ERROR:", e);
+
   }
+
 }
 
 /**
