@@ -533,14 +533,15 @@ function verifyEmailOTP(globals) {
       "https://ricotta-overcook-abrasive.ngrok-free.dev/api/verifyEmailOtp",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json"
         },
+
+        // IMPORTANT FIX
         body: JSON.stringify({
-          requestString: {
-            email,
-            otpValue: otp
-          }
+          email,
+          otpValue: otp
         })
       }
     )
@@ -558,17 +559,18 @@ function verifyEmailOTP(globals) {
 
         if (valid === "Y") {
 
-          // ✅ STORE VERIFIED STATUS
-          globals.functions.setProperty(
-            globals.form.emp_details
-              .work_email_id_panel
-              .email_verified,
-            {
-              value: "Y"
-            }
-          );
+          // SAVE VERIFIED STATUS
+          const emailField =
+            document.querySelector('.field-work-email-id');
 
-          // ✅ STATUS MESSAGE
+          if (emailField) {
+
+            emailField.setAttribute(
+              'data-email-verified',
+              'Y'
+            );
+          }
+
           globals.functions.setProperty(
             globals.form.emp_details
               .work_email_id_panel
@@ -578,7 +580,6 @@ function verifyEmailOTP(globals) {
             }
           );
 
-          // ✅ DISABLE VERIFY BUTTON
           globals.functions.setProperty(
             globals.form.emp_details
               .work_email_id_panel
@@ -588,7 +589,7 @@ function verifyEmailOTP(globals) {
             }
           );
 
-          console.log("EMAIL VERIFIED SUCCESSFULLY");
+          console.log("EMAIL VERIFIED");
 
         }
 
