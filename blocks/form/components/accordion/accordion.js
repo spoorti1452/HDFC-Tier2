@@ -1,4 +1,4 @@
-export function handleAccordionNavigation(panel, tab, forceOpen = false) { 
+export function handleAccordionNavigation(panel, tab, forceOpen = false) {
   const accordionTabs = panel?.querySelectorAll(':scope > fieldset');
 
   accordionTabs.forEach((otherTab) => {
@@ -14,76 +14,122 @@ export function handleAccordionNavigation(panel, tab, forceOpen = false) {
   }
 }
 
-/* ===== ADD VERIFY BUTTON ===== */
+/* =========================================================
+   ADD VERIFY BUTTON
+========================================================= */
 function addVerifyButton(panel) {
+
   const emailFields = panel.querySelectorAll(
     '.field-user-email-id, .field-work-email-id'
   );
 
   emailFields.forEach((emailField) => {
+
     const input = emailField.querySelector('input[type="email"]');
+
     if (!input) return;
 
+    // prevent duplicate button
     if (emailField.querySelector('.email-verify-btn')) return;
 
+    /* ===== VERIFY BUTTON ===== */
     const btn = document.createElement('button');
+
     btn.type = 'button';
     btn.className = 'email-verify-btn';
     btn.textContent = 'Verify';
 
     emailField.appendChild(btn);
 
-    /* ===== SEND OTP ===== */
+    /* =========================================================
+       SEND OTP
+    ========================================================= */
     btn.addEventListener('click', async () => {
+
       const email = input.value.trim();
 
+      // validate empty
       if (!email) {
-        alert('Please enter email');
+
+        btn.textContent = 'Enter Email';
+        btn.style.color = '#dc2626';
+
         return;
       }
 
+      // validate email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
       if (!emailRegex.test(email)) {
-        alert('Enter valid email');
+
+        btn.textContent = 'Invalid Email';
+        btn.style.color = '#dc2626';
+
         return;
       }
 
       try {
+
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+
         const res = await fetch(
           'https://ricotta-overcook-abrasive.ngrok-free.dev/api/sendEmailOtp',
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ email })
           }
         );
 
         const data = await res.json();
 
+        /* ===== SUCCESS ===== */
         if (data?.status?.responseCode === "0") {
 
+          // store email
           emailField.setAttribute('data-email', email);
 
-          input.setAttribute('readonly', true);
+          // restore button text
+          btn.textContent = 'Verify';
+          btn.style.color = '#5a78ff';
+          btn.disabled = false;
 
+          // show otp field
           showOtpField(emailField, input);
 
         } else {
-          alert('Failed to send OTP');
+
+          btn.textContent = 'Failed';
+          btn.style.color = '#dc2626';
+          btn.disabled = false;
+
         }
 
       } catch (e) {
+
         console.error(e);
-        alert('API Error');
+
+        btn.textContent = 'Error';
+        btn.style.color = '#dc2626';
+        btn.disabled = false;
+
       }
+
     });
+
   });
+
 }
 
-/* ===== OTP FIELD ===== */
+/* =========================================================
+   OTP FIELD
+========================================================= */
 function showOtpField(emailField, input) {
 
-  // prevent duplicate OTP field
+  // prevent duplicate otp field
   if (emailField.querySelector('.otp-container')) return;
 
   /* ===== OTP CONTAINER ===== */
@@ -95,9 +141,10 @@ function showOtpField(emailField, input) {
 
   otpInput.type = 'text';
   otpInput.placeholder = 'Enter OTP';
+
   otpInput.className = 'otp-input';
 
-  // IMPORTANT FOR AEM
+  // prevent AEM binding
   otpInput.setAttribute('autocomplete', 'off');
   otpInput.setAttribute('data-ignore', 'true');
   otpInput.setAttribute('data-aem-ignore', 'true');
@@ -105,7 +152,6 @@ function showOtpField(emailField, input) {
   otpInput.setAttribute('inputmode', 'numeric');
   otpInput.setAttribute('maxlength', '6');
 
-  // remove AEM binding
   otpInput.removeAttribute('name');
   otpInput.removeAttribute('id');
 
@@ -113,33 +159,36 @@ function showOtpField(emailField, input) {
   const verifyBtn = document.createElement('button');
 
   verifyBtn.type = 'button';
-  verifyBtn.textContent = 'Submit OTP';
   verifyBtn.className = 'otp-submit-btn';
+
+  verifyBtn.textContent = 'Submit OTP';
 
   /* ===== APPEND ===== */
   container.appendChild(otpInput);
   container.appendChild(verifyBtn);
 
-  // append INSIDE email wrapper
   emailField.appendChild(container);
 
-  /* ===== VERIFY OTP ===== */
+  /* =========================================================
+     VERIFY OTP
+  ========================================================= */
   verifyBtn.addEventListener('click', async () => {
 
     const otp = otpInput.value.trim();
 
     const email = emailField.getAttribute('data-email');
 
-    // no alert
+    // empty otp
     if (!otp) {
+
       verifyBtn.textContent = 'Enter OTP';
       verifyBtn.style.background = '#dc2626';
+
       return;
     }
 
     try {
 
-      // disable button while verifying
       verifyBtn.disabled = true;
       verifyBtn.textContent = 'Verifying...';
 
@@ -159,29 +208,32 @@ function showOtpField(emailField, input) {
 
       const data = await res.json();
 
-      /* ===== SUCCESS ===== */
+      /* ===== VERIFIED ===== */
       if (data?.responseString?.otpValid === "Y") {
+
+        // readonly only AFTER verification
+        input.setAttribute('readonly', true);
 
         // top verify button
         const mainBtn = emailField.querySelector('.email-verify-btn');
 
         if (mainBtn) {
+
           mainBtn.textContent = 'Verified';
           mainBtn.style.color = 'green';
           mainBtn.disabled = true;
+
         }
 
-        // disable otp field
         otpInput.disabled = true;
 
-        // success state
         verifyBtn.textContent = 'Verified';
         verifyBtn.style.background = '#16a34a';
 
       } else {
 
-        // invalid otp
         verifyBtn.disabled = false;
+
         verifyBtn.textContent = 'Invalid OTP';
         verifyBtn.style.background = '#dc2626';
 
@@ -192,6 +244,7 @@ function showOtpField(emailField, input) {
       console.error(e);
 
       verifyBtn.disabled = false;
+
       verifyBtn.textContent = 'Error';
       verifyBtn.style.background = '#dc2626';
 
@@ -200,27 +253,44 @@ function showOtpField(emailField, input) {
   });
 
 }
-/* ===== EMAIL SUGGESTIONS ===== */
+
+/* =========================================================
+   EMAIL SUGGESTIONS
+========================================================= */
 function addEmailSuggestions(panel) {
+
   const emailFields = panel.querySelectorAll('.field-user-email-id');
 
   emailFields.forEach((emailField) => {
+
     const wrapper = emailField.closest('.field-wrapper');
+
     const input = emailField.querySelector('input[type="email"]');
 
     if (!wrapper || !input) return;
+
+    // prevent duplicate
     if (wrapper.querySelector('.email-suggestions-js')) return;
 
+    /* ===== CONTAINER ===== */
     const container = document.createElement('div');
+
     container.className = 'email-suggestions-js';
 
-    const domains = ['@gmail.com', '@outlook.com', '@yahoo.com'];
+    const domains = [
+      '@gmail.com',
+      '@outlook.com',
+      '@yahoo.com'
+    ];
 
     domains.forEach((domain) => {
+
       const chip = document.createElement('span');
+
       chip.textContent = domain;
 
       chip.addEventListener('click', () => {
+
         let value = input.value;
 
         if (value.includes('@')) {
@@ -228,26 +298,36 @@ function addEmailSuggestions(panel) {
         }
 
         input.value = value + domain;
+
         input.focus();
+
       });
 
       container.appendChild(chip);
+
     });
 
     wrapper.appendChild(container);
+
   });
+
 }
 
-/* ===== MAIN ===== */
+/* =========================================================
+   MAIN
+========================================================= */
 export default function decorate(panel) {
+
   panel.classList.add('accordion');
 
   const accordionTabs = panel?.querySelectorAll(':scope > fieldset');
 
   accordionTabs?.forEach((tab, index) => {
+
     tab.dataset.index = index;
 
     const legend = tab.querySelector(':scope > legend');
+
     legend?.classList.add('accordion-legend');
 
     if (index !== 0) {
@@ -257,13 +337,17 @@ export default function decorate(panel) {
     legend?.addEventListener('click', () => {
       handleAccordionNavigation(panel, tab);
     });
+
   });
 
-  // 🔥 DELAY FOR AEM RENDER
+  // wait for AEM render
   setTimeout(() => {
+
     addVerifyButton(panel);
     addEmailSuggestions(panel);
+
   }, 300);
 
   return panel;
+
 }
