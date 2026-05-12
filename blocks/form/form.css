@@ -1530,3 +1530,322 @@ main .form .field-loan-amount input:focus {
   outline: none;
   border-bottom: 1px solid #3b82f6; /* subtle edit indicator */
 }
+
+/*====================================================================================*/
+/*==========================================BUREAU PAGE=========================*/
+ 
+/* ===== MAIN PANEL ===== */
+.field-select-bank-panel {
+    border: 1px solid #c7d2fe !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+    padding-top: 25px !important;
+    padding-bottom: 25px !important;
+    background: #fff;
+}
+ 
+/* ===== HIDE ORIGINAL LEGEND TEXT ===== */
+.field-select-bank-panel > legend.field-label {
+    font-size: 0 !important;
+    position: relative;
+    padding: 14px 16px !important;
+    border-radius: 12px;
+    background: #eef2ff;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    bottom: -25px;
+    margin-bottom: 16px !important;
+}
+ 
+/* ===== ICON ===== */
+.field-select-bank-panel > legend.field-label::before {
+    content: "";
+    width: 22px;
+    height: 22px;
+    display: inline-block;
+    background: url("/content/dam/s_hdfc_capstone/bank.svg") no-repeat center;
+    background-size: contain;
+}
+ 
+/* ===== CUSTOM TITLE ===== */
+.field-select-bank-panel > legend.field-label::after {
+    content: "Select bank where you receive your salary";
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+ 
+/* ===== CONTAINER ===== */
+.bank-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+ 
+/* ===== LEFT SIDE ===== */
+.bank-left {
+    flex: 1;
+    overflow: hidden;
+}
+ 
+/* ===== BANK ROW ===== */
+.bank-row {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-left: 25px;
+}
+ 
+/* ===== BANK CARD ===== */
+.bank-item {
+    min-width: 80px;
+    height: 80px;
+    background: #fff;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: 0.2s;
+}
+ 
+/* ===== ICON ===== */
+.bank-item img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-bottom: 6px;
+}
+ 
+/* ===== LABEL ===== */
+.bank-item span {
+    font-size: 11px;
+    text-align: center;
+}
+ 
+/* ===== HOVER ===== */
+.bank-item:hover {
+    border-color: #93c5fd;
+}
+ 
+/* ===== ACTIVE ===== */
+.bank-item.active {
+    border: 2px solid #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 2px #dbeafe;
+}
+ 
+/* ===== RIGHT SIDE ===== */
+.bank-right {
+    margin-left: 40px;
+}
+ 
+/* ===== DROPDOWN ===== */
+.bank-other-dropdown {
+    min-width: 220px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+}
+ 
+/* ===== SCROLLBAR ===== */
+.bank-row::-webkit-scrollbar {
+    height: 6px;
+}
+ 
+.bank-row::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+ 
+ 
+ 
+ 
+/* ===== FULL DISPLAY BOX ===== */
+.field-select-bank-panel {
+    overflow: hidden;
+    padding-top: 0 !important;
+    background: #fff;
+}
+ 
+/* ===== TOP HEADER STRIP ===== */
+.field-select-bank-panel > legend.field-label {
+    width: calc(100% + 2px);
+    margin: -1px -1px 0 -1px !important;
+ 
+    background: #eef2ff;
+ 
+    border-radius: 12px 12px 0 0 !important;
+ 
+    padding: 18px 24px !important;
+ 
+    bottom: 0 !important;
+}
+ 
+/* ===== CONTENT SECTION ===== */
+.field-select-bank-panel .bank-container {
+    padding: 24px;
+    margin-top: 0 !important;
+}
+ 
+/*---------------------------------e-verify panel-------------------------------------------*/
+ 
+/* ===== PANEL ===== */
+.field-income-verification-method-panel {
+    border: 1px solid #c7d2fe !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+    padding-top: 25px !important;
+    padding-bottom: 25px !important;
+    background: #fff;
+}
+ 
+/* ===== HIDE ORIGINAL LEGEND TEXT ===== */
+.field-income-verification-method-panel > legend.field-label {
+    font-size: 0 !important;
+    position: relative;
+    padding: 14px 16px !important;
+    border-radius: 12px;
+    background: #eef2ff;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+   
+    margin-bottom: 16px !important;
+}
+ 
+/* ===== ICON ===== */
+.field-income-verification-method-panel > legend.field-label::before {
+    content: "";
+    width: 22px;
+    height: 22px;
+    display: inline-block;
+    background: url("/content/dam/s_hdfc_capstone/verify-svgrepo-com.svg") no-repeat center;
+    background-size: contain;
+}
+ 
+/* ===== CUSTOM TITLE ===== */
+.field-income-verification-method-panel > legend.field-label::after {
+    content: "e-Verify your income using any one of the methods";
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+ 
+/* ===== RADIO GROUP ===== */
+.field-income-verification-method-panel .radio-group-wrapper {
+    display: flex !important;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+ 
+/* ===== CARD ===== */
+.field-income-verification-method-panel .radio-wrapper {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 15px 13px 15px 44px;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+    border: 2px solid #e5e7eb;
+    cursor: pointer;
+    position: relative;
+    transition: 0.25s;
+}
+ 
+/* ===== HIDE RADIO ===== */
+.field-income-verification-method-panel .radio-wrapper input[type="radio"] {
+    display: none;
+}
+ 
+/* ===== LABEL ===== */
+.field-income-verification-method-panel .radio-wrapper .field-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+    display: block;
+}
+ 
+/* ===== RADIO CIRCLE ===== */
+.field-income-verification-method-panel .radio-wrapper::before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    position: absolute;
+    top: 20px;
+    left: 16px;
+}
+ 
+/* ===== DESCRIPTION ===== */
+.field-income-verification-method-panel .radio-wrapper .field-label::after {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 6px;
+    font-weight: normal;
+}
+ 
+/* ===== ACCOUNT AGGREGATOR ===== */
+.field-income-verification-method-panel input[value="account_aggregator"] + .field-label::after {
+    content: "Instant & secure, processed via RBI-regulated partner.";
+}
+ 
+/* ===== LOGIN TO SALARY ACCOUNT ===== */
+.field-income-verification-method-panel input[value="login_to_salary_account"] + .field-label::after {
+    content: "Quick & hassle-free, processed via NetBanking.";
+}
+ 
+/* ===== UPLOAD BANK STATEMENT ===== */
+.field-income-verification-method-panel input[value="upload_bank_statement"] + .field-label::after {
+    content: "Upload bank statement of last 6 months.";
+}
+ 
+/* ===== ACTIVE CARD ===== */
+.field-income-verification-method-panel .radio-wrapper:has(input[type="radio"]:checked) {
+    border-color: #2563eb;
+    background: #f0f7ff;
+}
+ 
+/* ===== ACTIVE RADIO ===== */
+.field-income-verification-method-panel .radio-wrapper:has(input[type="radio"]:checked)::before {
+    border-color: #2563eb;
+    background: #2563eb;
+}
+ 
+/* ===== HOVER ===== */
+.field-income-verification-method-panel .radio-wrapper:hover {
+    border-color: #93c5fd;
+}
+ 
+/* ===== RECOMMENDED BADGE ===== */
+.field-income-verification-method-panel .radio-wrapper:first-child::after {
+    content: "Recommended";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #16a34a;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+    padding: 6px;
+    border-radius: 0 0 12px 12px;
+}
+ 
+.field-income-verification-method-panel {
+    padding-top: 60px !important;
+}
+ 
+.field-income-verification-method-panel {
+    margin-top: 40px !important;
+}
+ 
